@@ -1,7 +1,7 @@
 'use client';
+
 import { useState } from 'react';
 import Image from 'next/image';
-import { IoArrowBack, IoHome, IoTrophy, IoPerson } from 'react-icons/io5';
 import Head from 'next/head';
 
 export default function GameDashboard() {
@@ -13,7 +13,7 @@ export default function GameDashboard() {
         <title>Game Dashboard</title>
       </Head>
 
-      <div className="min-h-screen bg-indigo-600 flex flex-col">
+      <div className="flex flex-col flex-1">
         {/* Header */}
         <div className="px-5 pt-5 pb-8">
           <br />
@@ -50,7 +50,6 @@ export default function GameDashboard() {
               title="English Game"
               backgroundColor="#FFD6D6"
               iconSource="/english-Game.png"
-              size={100}
             />
             <GameCard
               title="Maths Game"
@@ -68,22 +67,6 @@ export default function GameDashboard() {
               iconSource="/Avatar.png"
             />
           </div>
-        </div>
-
-        {/* Bottom Navigation */}
-        <div className="flex justify-around bg-white border-t border-gray-200 py-3">
-          <button className="flex flex-col items-center text-indigo-600">
-            <IoHome size={24} />
-            <span className="text-xs mt-1 font-poppins font-medium">Dashboard</span>
-          </button>
-          <button className="flex flex-col items-center text-gray-400">
-            <IoTrophy size={24} />
-            <span className="text-xs mt-1 font-poppins">Score</span>
-          </button>
-          <button className="flex flex-col items-center text-gray-400">
-            <IoPerson size={24} />
-            <span className="text-xs mt-1 font-poppins">Profile</span>
-          </button>
         </div>
       </div>
     </>
