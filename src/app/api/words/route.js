@@ -1,39 +1,16 @@
-import { NextResponse } from 'next/server';
+import { PrismaClient } from "@prisma/client";
 
-export async function GET() {
-  const words = [
-    {
-      id: 1,
-      image: '/cat.png',
-      answer: 'CAT',
-      options: ['A', 'B', 'D', 'C', 'T', 'J']
-    },
-    {
-      id: 2,
-      image: '/dog.png',
-      answer: 'DOG',
-      options: ['O', 'P', 'D', 'G', 'H', 'K']
-    },
-    {
-      id: 3,
-      image: '/fish.png',
-      answer: 'FISH',
-      options: ['F', 'I', 'S', 'H', 'T', 'U']
-    },
-    {
-      id: 4,
-      image: '/bird.png',
-      answer: 'BIRD',
-      options: ['B', 'I', 'R', 'D', 'E', 'A']
-    },
-    {
-      id: 5,
-      image: '/frog.png',
-      answer: 'FROG',
-      options: ['F', 'R', 'O', 'G', 'H', 'J']
+const prisma = new PrismaClient();
+
+export default async function handler(req, res) {
+  if (req.method === "GET") {
+    try {
+      const words = await prisma.word.findMany();
+      res.status(200).json(words);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch words" });
     }
-    // Add more words
-  ];
-
-  return NextResponse.json(words);
+  } else {
+    res.status(405).json({ error: "Method not allowed" });
+  }
 }
