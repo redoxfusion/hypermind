@@ -1,103 +1,105 @@
-import Image from "next/image";
+'use client';
+import { useState } from 'react';
+import Image from 'next/image';
+import { IoArrowBack, IoHome, IoTrophy, IoPerson } from 'react-icons/io5';
+import Head from 'next/head';
 
-export default function Home() {
+export default function GameDashboard() {
+  const [activeTab, setActiveTab] = useState('All');
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <>
+      <Head>
+        <title>Game Dashboard</title>
+      </Head>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+      <div className="min-h-screen bg-indigo-600 flex flex-col">
+        {/* Header */}
+        <div className="px-5 pt-5 pb-8">
+          <br />
+          <div className="text-center">
+            <h1 className="text-4xl font-bold text-white leading-tight font-poppins">
+              Ready To<br />
+              <span className="text-yellow-400">Learn?</span>
+            </h1>
+            <p className="mt-3 text-white/80 text-sm font-poppins">Choose your Game.</p>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        {/* Content */}
+        <div className="flex-1 bg-white rounded-t-3xl overflow-hidden">
+          {/* Tabs */}
+          <div className="flex px-5 pt-5 space-x-6">
+            <button
+              className={`pb-2 font-poppins ${activeTab === 'All' ? 'border-b-2 border-indigo-600 font-semibold text-black' : 'text-gray-500'}`}
+              onClick={() => setActiveTab('All')}
+            >
+              All
+            </button>
+            <button
+              className={`pb-2 font-poppins ${activeTab === 'Favourite' ? 'border-b-2 border-indigo-600 font-semibold text-black' : 'text-gray-500'}`}
+              onClick={() => setActiveTab('Favourite')}
+            >
+              Favourite
+            </button>
+          </div>
+
+          {/* Game Cards */}
+          <div className="p-4 grid grid-cols-2 gap-4">
+            <GameCard
+              title="English Game"
+              backgroundColor="#FFD6D6"
+              iconSource="/english-Game.png"
+              size={100}
+            />
+            <GameCard
+              title="Maths Game"
+              backgroundColor="#D6FFF3"
+              iconSource="/Maths-Game.png"
+            />
+            <GameCard
+              title="Flags Game"
+              backgroundColor="#D6E6FF"
+              iconSource="/Flag-Game.png"
+            />
+            <GameCard
+              title="Talking Avatar"
+              backgroundColor="#FFCEC0"
+              iconSource="/Avatar.png"
+            />
+          </div>
+        </div>
+
+        {/* Bottom Navigation */}
+        <div className="flex justify-around bg-white border-t border-gray-200 py-3">
+          <button className="flex flex-col items-center text-indigo-600">
+            <IoHome size={24} />
+            <span className="text-xs mt-1 font-poppins font-medium">Dashboard</span>
+          </button>
+          <button className="flex flex-col items-center text-gray-400">
+            <IoTrophy size={24} />
+            <span className="text-xs mt-1 font-poppins">Score</span>
+          </button>
+          <button className="flex flex-col items-center text-gray-400">
+            <IoPerson size={24} />
+            <span className="text-xs mt-1 font-poppins">Profile</span>
+          </button>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function GameCard({ title, backgroundColor, iconSource }) {
+  return (
+    <div
+      className="flex flex-col items-center justify-center p-5 rounded-2xl aspect-square"
+      style={{ backgroundColor }}
+    >
+      <div className="mb-3">
+        <Image src={iconSource} alt={title} width={60} height={60} className="rounded-lg" />
+      </div>
+      <h3 className="text-sm text-gray-800 font-poppins font-medium text-center">{title}</h3>
     </div>
   );
 }
