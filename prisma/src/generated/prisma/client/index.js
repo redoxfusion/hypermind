@@ -123,7 +123,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\talha\\OneDrive\\Software Engineering\\Projects\\hypermind\\src\\generated\\prisma",
+      "value": "C:\\Users\\talha\\OneDrive\\Software Engineering\\Projects\\hypermind\\prisma\\src\\generated\\prisma\\client",
       "fromEnvVar": null
     },
     "config": {
@@ -141,10 +141,10 @@ const config = {
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": null,
-    "schemaEnvPath": "../../../.env"
+    "rootEnvPath": "../../../../../.env",
+    "schemaEnvPath": "../../../../../.env"
   },
-  "relativePath": "../../../prisma",
+  "relativePath": "../../../..",
   "clientVersion": "6.6.0",
   "engineVersion": "f676762280b54cd07c770017ed3711ddde35f37a",
   "datasourceNames": [
@@ -160,8 +160,8 @@ const config = {
       }
     }
   },
-  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel Word {\n  id      Int      @id @default(autoincrement())\n  answer  String\n  image   String\n  options String[]\n  level   Int\n}\n",
-  "inlineSchemaHash": "a385c347c0431a93d7ee97681a50ec38f8714775b4d033f5052997b1db380ecc",
+  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"src/generated/prisma/client\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel Word {\n  id      Int      @id @default(autoincrement())\n  answer  String\n  image   String\n  options String[]\n  level   Int\n}\n",
+  "inlineSchemaHash": "46dc65f74b0c867bbec23f694a8f3732f4a822f6b481337ba04a04a402640a87",
   "copyEngine": true
 }
 
@@ -170,8 +170,8 @@ const fs = require('fs')
 config.dirname = __dirname
 if (!fs.existsSync(path.join(__dirname, 'schema.prisma'))) {
   const alternativePaths = [
-    "src/generated/prisma",
-    "generated/prisma",
+    "prisma/src/generated/prisma/client",
+    "src/generated/prisma/client",
   ]
   
   const alternativePath = alternativePaths.find((altPath) => {
@@ -201,7 +201,7 @@ Object.assign(exports, Prisma)
 
 // file annotations for bundling tools to include these files
 path.join(__dirname, "query_engine-windows.dll.node");
-path.join(process.cwd(), "src/generated/prisma/query_engine-windows.dll.node")
+path.join(process.cwd(), "prisma/src/generated/prisma/client/query_engine-windows.dll.node")
 // file annotations for bundling tools to include these files
 path.join(__dirname, "schema.prisma");
-path.join(process.cwd(), "src/generated/prisma/schema.prisma")
+path.join(process.cwd(), "prisma/src/generated/prisma/client/schema.prisma")

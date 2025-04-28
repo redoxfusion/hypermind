@@ -10,19 +10,31 @@ export default function EnglishGame() {
   const [current, setCurrent] = useState(0);
   const [selectedLetters, setSelectedLetters] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [level, setLevel] = useState(1); // Add level state
 
   useEffect(() => {
     async function fetchWords() {
-      const res = await fetch('/api/words');
-      const data = await res.json();
-      setWords(data);
-      setLoading(false);
+      try {
+        const res = await fetch(`/api/words?level=${level}`);
+        if (!res.ok) throw new Error('Failed to fetch words');
+        const data = await res.json();
+        if (data.length === 0) {
+          setLoading(false);
+          return;
+        }
+        setWords(data);
+        setLoading(false);
+      } catch (error) {
+        console.error(error);
+        setLoading(false);
+      }
     }
 
     fetchWords();
-  }, []);
+  }, [level]);
 
   if (loading) return <div className="text-center mt-20 text-white">Loading...</div>;
+  if (words.length === 0) return <div className="text-center mt-20 text-white">No words available for this level.</div>;
 
   const currentWord = words[current];
 
@@ -34,7 +46,14 @@ export default function EnglishGame() {
 
   const handleNext = () => {
     setSelectedLetters([]);
-    setCurrent((prev) => (prev + 1) % words.length);
+    const nextIndex = current + 1;
+    if (nextIndex < words.length) {
+      setCurrent(nextIndex);
+    } else {
+      // Move to next level if available
+      setLevel((prev) => prev + 1);
+      setCurrent(0);
+    }
   };
 
   const isComplete = selectedLetters.join('') === currentWord.answer;

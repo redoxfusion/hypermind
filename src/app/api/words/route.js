@@ -1,16 +1,23 @@
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/prisma";
 
-const prisma = new PrismaClient();
+export async function GET(req) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const level = parseInt(searchParams.get('level')) || 1;
 
-export default async function handler(req, res) {
-  if (req.method === "GET") {
-    try {
-      const words = await prisma.word.findMany();
-      res.status(200).json(words);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to fetch words" });
-    }
-  } else {
-    res.status(405).json({ error: "Method not allowed" });
+    const words = await prisma.word.findMany({
+      where: { level },
+    });
+
+    return new Response(JSON.stringify(words), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  } catch (error) {
+    console.error('Error fetching words:', error);
+    return new Response(JSON.stringify({ error: 'Failed to fetch words' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 }
