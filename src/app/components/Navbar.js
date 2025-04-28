@@ -1,6 +1,13 @@
-'use client';
+"use client";
 
-import { IoHome, IoTrophy, IoPerson } from 'react-icons/io5';
+import {
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  SignUpButton,
+  UserButton,
+} from "@clerk/nextjs";
+import { IoHome, IoTrophy, IoPerson } from "react-icons/io5";
 
 export default function BottomNavBar() {
   return (
@@ -17,6 +24,13 @@ export default function BottomNavBar() {
         <IoPerson size={24} />
         <span className="text-xs mt-1 font-poppins">Profile</span>
       </button>
+      <SignedOut>
+        <SignInButton />
+        <SignUpButton />
+      </SignedOut>
+      <SignedIn>
+        <UserButton />
+      </SignedIn>
     </div>
   );
 }

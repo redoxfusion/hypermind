@@ -9,9 +9,11 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@clerk/nextjs": "^6.18.0",
     "@prisma/client": "^6.6.0",
     "hypermind": "file:",
     "next": "15.3.1",
+    "nextjs-toploader": "^3.8.16",
     "prisma": "^6.6.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

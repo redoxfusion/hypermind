@@ -4,13 +4,15 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { IoArrowBack } from 'react-icons/io5';
+import { IoBackspaceOutline } from 'react-icons/io5';
+import { IoTrashOutline } from 'react-icons/io5';
 
 export default function EnglishGame() {
   const [words, setWords] = useState([]);
   const [current, setCurrent] = useState(0);
   const [selectedLetters, setSelectedLetters] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [level, setLevel] = useState(1); // Add level state
+  const [level, setLevel] = useState(1);
 
   useEffect(() => {
     async function fetchWords() {
@@ -44,13 +46,20 @@ export default function EnglishGame() {
     }
   };
 
+  const handleBackspace = () => {
+    setSelectedLetters(selectedLetters.slice(0, -1)); // Remove the last letter
+  };
+
+  const handleClear = () => {
+    setSelectedLetters([]); // Clear all selected letters
+  };
+
   const handleNext = () => {
     setSelectedLetters([]);
     const nextIndex = current + 1;
     if (nextIndex < words.length) {
       setCurrent(nextIndex);
     } else {
-      // Move to next level if available
       setLevel((prev) => prev + 1);
       setCurrent(0);
     }
@@ -77,12 +86,30 @@ export default function EnglishGame() {
         />
 
         {/* Selected Letters */}
-        <div className="flex gap-4 bg-white rounded-2xl px-8 py-4 mb-6">
+        <div className="flex gap-4 bg-white rounded-2xl px-8 py-4 mb-2">
           {currentWord.answer.split('').map((char, index) => (
-            <div key={index} className="text-4xl font-bold underline">
+            <div key={index} className="text-4xl font-bold underline text-gray-400">
               {selectedLetters[index] || '_'}
             </div>
           ))}
+        </div>
+
+        {/* Backspace and Clear Buttons */}
+        <div className="flex gap-2 mb-6">
+          <button
+            onClick={handleBackspace}
+            className="bg-white text-black rounded-full p-2 hover:bg-gray-200"
+            disabled={selectedLetters.length === 0}
+          >
+            <IoBackspaceOutline size={24} />
+          </button>
+          <button
+            onClick={handleClear}
+            className="bg-white text-black rounded-full p-2 hover:bg-gray-200"
+            disabled={selectedLetters.length === 0}
+          >
+            <IoTrashOutline size={24} />
+          </button>
         </div>
 
         {/* Option Letters */}

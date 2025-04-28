@@ -125,6 +125,27 @@ exports.Prisma.WordScalarFieldEnum = {
   level: 'level'
 };
 
+exports.Prisma.GameScalarFieldEnum = {
+  id: 'id',
+  name: 'name'
+};
+
+exports.Prisma.UserProgressScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  gameId: 'gameId',
+  levelsPassed: 'levelsPassed'
+};
+
+exports.Prisma.ScoreScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  gameId: 'gameId',
+  level: 'level',
+  score: 'score',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -137,7 +158,10 @@ exports.Prisma.QueryMode = {
 
 
 exports.Prisma.ModelName = {
-  Word: 'Word'
+  Word: 'Word',
+  Game: 'Game',
+  UserProgress: 'UserProgress',
+  Score: 'Score'
 };
 
 /**
