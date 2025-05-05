@@ -1,9 +1,8 @@
-const { PrismaClient } = require("@prisma/client");
+const { PrismaClient } = require('./app/generated/prisma/client');
 const prisma = new PrismaClient();
 
 async function main() {
   console.log("Starting seeding process...");
-  console.log("Prisma Client:", prisma);
 
   // Check if prisma.game is defined
   if (!prisma.game) {

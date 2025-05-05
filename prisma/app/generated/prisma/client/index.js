@@ -147,7 +147,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\talha\\OneDrive\\Software Engineering\\Projects\\hypermind\\prisma\\src\\generated\\prisma\\client",
+      "value": "C:\\Users\\talha\\OneDrive\\Software Engineering\\Projects\\hypermind\\prisma\\app\\generated\\prisma\\client",
       "fromEnvVar": null
     },
     "config": {
@@ -184,8 +184,8 @@ const config = {
       }
     }
   },
-  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"src/generated/prisma/client\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel Word {\n  id      Int      @id @default(autoincrement())\n  answer  String\n  image   String\n  options String[]\n  level   Int\n}\n\nmodel Game {\n  id           Int            @id @default(autoincrement())\n  name         String         @unique\n  scores       Score[]\n  userProgress UserProgress[]\n}\n\nmodel UserProgress {\n  id           Int    @id @default(autoincrement())\n  userId       String\n  gameId       Int\n  levelsPassed Int    @default(0)\n  game         Game   @relation(fields: [gameId], references: [id])\n}\n\nmodel Score {\n  id        Int      @id @default(autoincrement())\n  userId    String\n  gameId    Int\n  level     Int\n  score     Int\n  createdAt DateTime @default(now())\n  game      Game     @relation(fields: [gameId], references: [id])\n}\n",
-  "inlineSchemaHash": "00bbcaef1ff317bcfcffc1adffde4e849557f6b70f4f03f270629848bb4931b8",
+  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"app/generated/prisma/client\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel Word {\n  id      Int      @id @default(autoincrement())\n  answer  String\n  image   String\n  options String[]\n  level   Int\n}\n\nmodel Game {\n  id           Int            @id @default(autoincrement())\n  name         String         @unique\n  scores       Score[]\n  userProgress UserProgress[]\n}\n\nmodel UserProgress {\n  id           Int    @id @default(autoincrement())\n  userId       String\n  gameId       Int\n  levelsPassed Int    @default(0)\n  game         Game   @relation(fields: [gameId], references: [id])\n}\n\nmodel Score {\n  id        Int      @id @default(autoincrement())\n  userId    String\n  gameId    Int\n  level     Int\n  score     Int\n  createdAt DateTime @default(now())\n  game      Game     @relation(fields: [gameId], references: [id])\n}\n",
+  "inlineSchemaHash": "d3309ee7361e0dc2c4c2c0ac65dd087f5e1cd94366c16a9d6bae6f28b88431cd",
   "copyEngine": true
 }
 
@@ -194,8 +194,8 @@ const fs = require('fs')
 config.dirname = __dirname
 if (!fs.existsSync(path.join(__dirname, 'schema.prisma'))) {
   const alternativePaths = [
-    "prisma/src/generated/prisma/client",
-    "src/generated/prisma/client",
+    "prisma/app/generated/prisma/client",
+    "app/generated/prisma/client",
   ]
   
   const alternativePath = alternativePaths.find((altPath) => {
@@ -225,7 +225,7 @@ Object.assign(exports, Prisma)
 
 // file annotations for bundling tools to include these files
 path.join(__dirname, "query_engine-windows.dll.node");
-path.join(process.cwd(), "prisma/src/generated/prisma/client/query_engine-windows.dll.node")
+path.join(process.cwd(), "prisma/app/generated/prisma/client/query_engine-windows.dll.node")
 // file annotations for bundling tools to include these files
 path.join(__dirname, "schema.prisma");
-path.join(process.cwd(), "prisma/src/generated/prisma/client/schema.prisma")
+path.join(process.cwd(), "prisma/app/generated/prisma/client/schema.prisma")
