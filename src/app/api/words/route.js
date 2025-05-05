@@ -1,39 +1,23 @@
-import { NextResponse } from 'next/server';
+import prisma from "@/lib/prisma";
 
-export async function GET() {
-  const words = [
-    {
-      id: 1,
-      image: '/cat.png',
-      answer: 'CAT',
-      options: ['A', 'B', 'D', 'C', 'T', 'J']
-    },
-    {
-      id: 2,
-      image: '/dog.png',
-      answer: 'DOG',
-      options: ['O', 'P', 'D', 'G', 'H', 'K']
-    },
-    {
-      id: 3,
-      image: '/fish.png',
-      answer: 'FISH',
-      options: ['F', 'I', 'S', 'H', 'T', 'U']
-    },
-    {
-      id: 4,
-      image: '/bird.png',
-      answer: 'BIRD',
-      options: ['B', 'I', 'R', 'D', 'E', 'A']
-    },
-    {
-      id: 5,
-      image: '/frog.png',
-      answer: 'FROG',
-      options: ['F', 'R', 'O', 'G', 'H', 'J']
-    }
-    // Add more words
-  ];
+export async function GET(req) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const level = parseInt(searchParams.get('level')) || 1;
 
-  return NextResponse.json(words);
+    const words = await prisma.word.findMany({
+      where: { level },
+    });
+
+    return new Response(JSON.stringify(words), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  } catch (error) {
+    console.error('Error fetching words:', error);
+    return new Response(JSON.stringify({ error: 'Failed to fetch words' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
 }

@@ -1,0 +1,42 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "app/generated/prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Word {
+  id      Int      @id @default(autoincrement())
+  answer  String
+  image   String
+  options String[]
+  level   Int
+}
+
+model Game {
+  id           Int            @id @default(autoincrement())
+  name         String         @unique
+  scores       Score[]
+  userProgress UserProgress[]
+}
+
+model UserProgress {
+  id           Int    @id @default(autoincrement())
+  userId       String
+  gameId       Int
+  levelsPassed Int    @default(0)
+  game         Game   @relation(fields: [gameId], references: [id])
+}
+
+model Score {
+  id        Int      @id @default(autoincrement())
+  userId    String
+  gameId    Int
+  level     Int
+  score     Int
+  createdAt DateTime @default(now())
+  game      Game     @relation(fields: [gameId], references: [id])
+}

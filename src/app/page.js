@@ -1,11 +1,18 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import Head from 'next/head';
+import { useRouter } from 'nextjs-toploader/app';
+import GameCard from './components/dashboard/game-card';
+
 
 export default function GameDashboard() {
   const [activeTab, setActiveTab] = useState('All');
+  const router = useRouter();
+
+  const handleCardClick = (path) => {
+    router.push(path);
+  }
 
   return (
     <>
@@ -50,6 +57,7 @@ export default function GameDashboard() {
               title="English Game"
               backgroundColor="#FFD6D6"
               iconSource="/english-Game.png"
+              onClick={() => handleCardClick('/english-game')}
             />
             <GameCard
               title="Maths Game"
@@ -70,19 +78,5 @@ export default function GameDashboard() {
         </div>
       </div>
     </>
-  );
-}
-
-function GameCard({ title, backgroundColor, iconSource }) {
-  return (
-    <div
-      className="flex flex-col items-center justify-center p-5 rounded-2xl aspect-square"
-      style={{ backgroundColor }}
-    >
-      <div className="mb-3">
-        <Image src={iconSource} alt={title} width={60} height={60} className="rounded-lg" />
-      </div>
-      <h3 className="text-sm text-gray-800 font-poppins font-medium text-center">{title}</h3>
-    </div>
   );
 }
