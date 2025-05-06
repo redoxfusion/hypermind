@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "app/generated/prisma/client"
+  output   = "../src/generated/prisma/client"
 }
 
 datasource db {
@@ -29,6 +29,8 @@ model UserProgress {
   gameId       Int
   levelsPassed Int    @default(0)
   game         Game   @relation(fields: [gameId], references: [id])
+
+  @@unique([userId, gameId]) // Add composite unique constraint
 }
 
 model Score {

@@ -5762,6 +5762,7 @@ export namespace Prisma {
 
   export type UserProgressWhereUniqueInput = Prisma.AtLeast<{
     id?: number
+    userId_gameId?: UserProgressUserIdGameIdCompoundUniqueInput
     AND?: UserProgressWhereInput | UserProgressWhereInput[]
     OR?: UserProgressWhereInput[]
     NOT?: UserProgressWhereInput | UserProgressWhereInput[]
@@ -5769,7 +5770,7 @@ export namespace Prisma {
     gameId?: IntFilter<"UserProgress"> | number
     levelsPassed?: IntFilter<"UserProgress"> | number
     game?: XOR<GameScalarRelationFilter, GameWhereInput>
-  }, "id">
+  }, "id" | "userId_gameId">
 
   export type UserProgressOrderByWithAggregationInput = {
     id?: SortOrder
@@ -6198,6 +6199,11 @@ export namespace Prisma {
   export type GameScalarRelationFilter = {
     is?: GameWhereInput
     isNot?: GameWhereInput
+  }
+
+  export type UserProgressUserIdGameIdCompoundUniqueInput = {
+    userId: string
+    gameId: number
   }
 
   export type UserProgressCountOrderByAggregateInput = {
