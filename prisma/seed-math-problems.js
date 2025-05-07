@@ -24,26 +24,15 @@ function generateOptions(correctAnswer, usedNumbers = []) {
   return shuffle(options);
 }
 
-// Function to safely evaluate a math expression
-function evaluateExpression(expr) {
-  try {
-    const sanitized = expr
-      .replace('×', '*')
-      .replace('÷', '/')
-      .replace(/(\d+)\s*([\+\-\×\÷])\s*(\d+)/g, (_, a, op, b) => {
-        a = parseInt(a);
-        b = parseInt(b);
-        if (op === '+') return (a + b).toString();
-        if (op === '-') return (a - b).toString();
-        if (op === '*') return (a * b).toString();
-        if (op === '/' && b !== 0) return (Math.floor(a / b)).toString();
-        return '0'; // Default to 0 if division by zero
-      });
-    return eval(sanitized);
-  } catch (e) {
-    console.error(`Evaluation error for ${expr}: ${e}`);
-    return 0;
-  }
+// Function to compute a simple two-term expression
+function computeExpression(a, op, b) {
+  a = parseInt(a);
+  b = parseInt(b);
+  if (op === '+') return a + b;
+  if (op === '-') return a - b;
+  if (op === '×') return a * b;
+  if (op === '÷' && b !== 0) return Math.floor(a / b);
+  return a; // Default for invalid cases, fallback to a
 }
 
 async function main() {
@@ -79,22 +68,18 @@ async function main() {
       answer = level % 2 === 0 ? a * b : b;
       usedNumbers.push(a * b); // Avoid reusing the product in distractors for division
     } else {
-      // Levels 21-30: Mixed operations with larger numbers
-      const a = Math.floor(Math.random() * 50) + 1;
+      // Levels 21-30: Two-term mixed operations with larger numbers
+      const a = Math.floor(Math.random() * 100) + 1; // Increased range for harder problems
       const b = Math.floor(Math.random() * 50) + 1;
-      const c = Math.floor(Math.random() * 20) + 1;
       const operations = ['+', '-', '×', '÷'];
-      const op1 = operations[Math.floor(Math.random() * 3)]; // Avoid division initially
-      let op2 = operations[Math.floor(Math.random() * 3)];
-      let expr = `(${a} ${op1} ${b}) ${op2} ${c}`;
-      answer = evaluateExpression(expr);
-      // Ensure answer is an integer and adjust if division is involved
-      if (op2 === '÷' && c === 0) {
-        op2 = '+';
-        expr = `(${a} ${op1} ${b}) + ${c}`;
-        answer = evaluateExpression(expr);
+      const op = operations[Math.floor(Math.random() * 4)];
+      problem = `${a} ${op} ${b}`;
+      answer = computeExpression(a, op, b);
+      if (op === '÷' && b === 0) {
+        b = 1; // Adjust to avoid division by zero
+        problem = `${a} ${op} ${b}`;
+        answer = computeExpression(a, op, b);
       }
-      problem = expr;
     }
 
     const options = generateOptions(answer, usedNumbers);

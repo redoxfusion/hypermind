@@ -12,6 +12,7 @@ async function main() {
     data: [
       { name: "EnglishGame" },
       { name: "FlagsGame" },
+      { name: "MathsGame" },
     ],
     skipDuplicates: true,
   });

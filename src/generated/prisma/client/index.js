@@ -201,17 +201,18 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
         "fromEnvVar": "DATABASE_URL",
-        "value": "prisma+postgres://accelerate.prisma-data.net/?api_key=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlfa2V5IjoiZWZiZDBjYzEtZTFhNC00NjljLWJjZWEtN2JhM2VhYWJhNDM3IiwidGVuYW50X2lkIjoiNTViNGFjNzA3YWE5MDBjODVjNzU2YjBkOWUyODE0OWE4YmM0ODA4OTYyMGQ2Y2RkZGM4MDkyMjQxYTYyNjVhMyIsImludGVybmFsX3NlY3JldCI6IjAwZWM0ZGNlLWM0MzItNDU3Mi1hZTQ0LTM0YjQzZDZhODM1ZiJ9.2V3SpMreLJNMSuV-W53jdNRkcajmStnqe7M_urPugek"
+        "value": null
       }
     }
   },
   "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/prisma/client\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel Word {\n  id      Int      @id @default(autoincrement())\n  answer  String\n  image   String\n  options String[]\n  level   Int\n  gameId  Int?\n  game    Game?    @relation(fields: [gameId], references: [id])\n\n  @@unique([gameId, answer]) // Add composite unique constraint\n}\n\nmodel MathProblem {\n  id      Int    @id @default(autoincrement())\n  problem String @unique\n  answer  Int\n  options Json   @db.Json\n  level   Int\n  gameId  Int\n  game    Game   @relation(fields: [gameId], references: [id])\n}\n\nmodel Game {\n  id           Int            @id @default(autoincrement())\n  name         String         @unique\n  words        Word[]\n  userProgress UserProgress[]\n  mathProblems MathProblem[]\n  scores       Score[]\n}\n\nmodel UserProgress {\n  id           Int    @id @default(autoincrement())\n  userId       String\n  gameId       Int\n  levelsPassed Int    @default(0)\n  game         Game   @relation(fields: [gameId], references: [id])\n\n  @@unique([userId, gameId]) // Add composite unique constraint\n}\n\nmodel Score {\n  id        Int      @id @default(autoincrement())\n  userId    String\n  gameId    Int\n  level     Int\n  score     Int\n  createdAt DateTime @default(now())\n  game      Game     @relation(fields: [gameId], references: [id])\n}\n",
   "inlineSchemaHash": "093119d0dd2f4c7fb864709ba0cfa9780bde67bf8bac389f7ddf1693df58bf2f",
-  "copyEngine": false
+  "copyEngine": true
 }
 
 const fs = require('fs')
@@ -248,3 +249,9 @@ const PrismaClient = getPrismaClient(config)
 exports.PrismaClient = PrismaClient
 Object.assign(exports, Prisma)
 
+// file annotations for bundling tools to include these files
+path.join(__dirname, "query_engine-windows.dll.node");
+path.join(process.cwd(), "src/generated/prisma/client/query_engine-windows.dll.node")
+// file annotations for bundling tools to include these files
+path.join(__dirname, "schema.prisma");
+path.join(process.cwd(), "src/generated/prisma/client/schema.prisma")
