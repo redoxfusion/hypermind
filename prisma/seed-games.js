@@ -1,10 +1,9 @@
-const { PrismaClient } = require('./app/generated/prisma/client');
+const { PrismaClient } = require('../src/generated/prisma/client');
 const prisma = new PrismaClient();
 
 async function main() {
   console.log("Starting seeding process...");
 
-  // Check if prisma.game is defined
   if (!prisma.game) {
     throw new Error("prisma.game is undefined. Ensure the Game model is defined in schema.prisma and prisma generate has been run.");
   }
@@ -12,7 +11,9 @@ async function main() {
   await prisma.game.createMany({
     data: [
       { name: "EnglishGame" },
+      { name: "FlagsGame" },
     ],
+    skipDuplicates: true,
   });
   console.log("Seeding completed successfully!");
 }

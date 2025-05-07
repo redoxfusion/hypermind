@@ -9,7 +9,7 @@ export default function DashboardLayout({ children }) {
       <html>
         <body>
           <div className="flex flex-col min-h-screen bg-indigo-600">
-          <NextTopLoader />
+          <NextTopLoader color="#ffffff" />
             {children}
             <BottomNavBar />
           </div>

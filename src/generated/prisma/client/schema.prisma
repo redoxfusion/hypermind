@@ -14,13 +14,29 @@ model Word {
   image   String
   options String[]
   level   Int
+  gameId  Int?
+  game    Game?    @relation(fields: [gameId], references: [id])
+
+  @@unique([gameId, answer]) // Add composite unique constraint
+}
+
+model MathProblem {
+  id      Int    @id @default(autoincrement())
+  problem String @unique
+  answer  Int
+  options Json   @db.Json
+  level   Int
+  gameId  Int
+  game    Game   @relation(fields: [gameId], references: [id])
 }
 
 model Game {
   id           Int            @id @default(autoincrement())
   name         String         @unique
-  scores       Score[]
+  words        Word[]
   userProgress UserProgress[]
+  mathProblems MathProblem[]
+  scores       Score[]
 }
 
 model UserProgress {

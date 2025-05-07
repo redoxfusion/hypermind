@@ -122,7 +122,17 @@ exports.Prisma.WordScalarFieldEnum = {
   answer: 'answer',
   image: 'image',
   options: 'options',
-  level: 'level'
+  level: 'level',
+  gameId: 'gameId'
+};
+
+exports.Prisma.MathProblemScalarFieldEnum = {
+  id: 'id',
+  problem: 'problem',
+  answer: 'answer',
+  options: 'options',
+  level: 'level',
+  gameId: 'gameId'
 };
 
 exports.Prisma.GameScalarFieldEnum = {
@@ -151,14 +161,30 @@ exports.Prisma.SortOrder = {
   desc: 'desc'
 };
 
+exports.Prisma.JsonNullValueInput = {
+  JsonNull: Prisma.JsonNull
+};
+
 exports.Prisma.QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
 };
 
+exports.Prisma.NullsOrder = {
+  first: 'first',
+  last: 'last'
+};
+
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
+};
+
 
 exports.Prisma.ModelName = {
   Word: 'Word',
+  MathProblem: 'MathProblem',
   Game: 'Game',
   UserProgress: 'UserProgress',
   Score: 'Score'

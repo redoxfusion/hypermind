@@ -8,21 +8,21 @@ export async function POST(request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { level, score } = await request.json();
+  const { level, score, game } = await request.json();
 
   try {
-    const game = await prisma.game.findUnique({
-      where: { name: "EnglishGame" },
+    const game_obj = await prisma.game.findUnique({
+      where: { name: game },
     });
 
-    if (!game) {
+    if (!game_obj) {
       return NextResponse.json({ error: "Game not found" }, { status: 404 });
     }
 
     const newScore = await prisma.score.create({
       data: {
         userId,
-        gameId: game.id,
+        gameId: game_obj.id,
         level,
         score,
       },
@@ -38,23 +38,31 @@ export async function POST(request) {
   }
 }
 
-export async function GET() {
+export async function GET(request) {
   const { userId } = await auth();
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  // Get game from query parameters
+  const { searchParams } = new URL(request.url);
+  const game = searchParams.get('game');
+
+  if (!game) {
+    return NextResponse.json({ error: "Game parameter is required" }, { status: 400 });
+  }
+
   try {
-    const game = await prisma.game.findUnique({
-      where: { name: "EnglishGame" },
+    const game_obj = await prisma.game.findUnique({
+      where: { name: game },
     });
 
-    if (!game) {
+    if (!game_obj) {
       return NextResponse.json({ error: "Game not found" }, { status: 404 });
     }
 
     const scores = await prisma.score.findMany({
-      where: { userId, gameId: game.id },
+      where: { userId, gameId: game_obj.id },
       orderBy: { level: "asc" },
     });
 

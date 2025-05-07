@@ -2,15 +2,23 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 
-export async function GET() {
+export async function GET(request) {
   const { userId } = await auth();
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  // Get game from query parameters
+  const { searchParams } = new URL(request.url);
+  const game = searchParams.get('game');
+
+  if (!game) {
+    return NextResponse.json({ error: "Game parameter is required" }, { status: 400 });
+  }
+
   try {
     const progress = await prisma.userProgress.findFirst({
-      where: { userId, game: { name: "EnglishGame" } },
+      where: { userId, game: { name: game } },
       include: { game: true },
     });
 
@@ -29,25 +37,25 @@ export async function POST(request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { levelsPassed } = await request.json();
+  const { levelsPassed, game } = await request.json();
 
   try {
-    const game = await prisma.game.findUnique({
-      where: { name: "EnglishGame" },
+    const game_obj = await prisma.game.findUnique({
+      where: { name: game },
     });
 
-    if (!game) {
+    if (!game_obj) {
       return NextResponse.json({ error: "Game not found" }, { status: 404 });
     }
 
     const progress = await prisma.userProgress.upsert({
       where: {
-        userId_gameId: { userId, gameId: game.id }, // Composite unique key
+        userId_gameId: { userId, gameId: game_obj.id }, // Composite unique key
       },
       update: { levelsPassed },
       create: {
         userId,
-        gameId: game.id,
+        gameId: game_obj.id,
         levelsPassed,
       },
     });

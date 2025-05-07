@@ -63,11 +63,13 @@ export default function GameDashboard() {
               title="Maths Game"
               backgroundColor="#D6FFF3"
               iconSource="/Maths-Game.png"
+              onClick={() => handleCardClick('/maths-game')}
             />
             <GameCard
               title="Flags Game"
               backgroundColor="#D6E6FF"
               iconSource="/Flag-Game.png"
+              onClick={() => handleCardClick('/flag-game')}
             />
             <GameCard
               title="Talking Avatar"

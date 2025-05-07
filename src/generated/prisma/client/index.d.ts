@@ -19,6 +19,11 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
  */
 export type Word = $Result.DefaultSelection<Prisma.$WordPayload>
 /**
+ * Model MathProblem
+ * 
+ */
+export type MathProblem = $Result.DefaultSelection<Prisma.$MathProblemPayload>
+/**
  * Model Game
  * 
  */
@@ -168,6 +173,16 @@ export class PrismaClient<
     * ```
     */
   get word(): Prisma.WordDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.mathProblem`: Exposes CRUD operations for the **MathProblem** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more MathProblems
+    * const mathProblems = await prisma.mathProblem.findMany()
+    * ```
+    */
+  get mathProblem(): Prisma.MathProblemDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.game`: Exposes CRUD operations for the **Game** model.
@@ -639,6 +654,7 @@ export namespace Prisma {
 
   export const ModelName: {
     Word: 'Word',
+    MathProblem: 'MathProblem',
     Game: 'Game',
     UserProgress: 'UserProgress',
     Score: 'Score'
@@ -660,7 +676,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "word" | "game" | "userProgress" | "score"
+      modelProps: "word" | "mathProblem" | "game" | "userProgress" | "score"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -735,6 +751,80 @@ export namespace Prisma {
           count: {
             args: Prisma.WordCountArgs<ExtArgs>
             result: $Utils.Optional<WordCountAggregateOutputType> | number
+          }
+        }
+      }
+      MathProblem: {
+        payload: Prisma.$MathProblemPayload<ExtArgs>
+        fields: Prisma.MathProblemFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.MathProblemFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MathProblemPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.MathProblemFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MathProblemPayload>
+          }
+          findFirst: {
+            args: Prisma.MathProblemFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MathProblemPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.MathProblemFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MathProblemPayload>
+          }
+          findMany: {
+            args: Prisma.MathProblemFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MathProblemPayload>[]
+          }
+          create: {
+            args: Prisma.MathProblemCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MathProblemPayload>
+          }
+          createMany: {
+            args: Prisma.MathProblemCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.MathProblemCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MathProblemPayload>[]
+          }
+          delete: {
+            args: Prisma.MathProblemDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MathProblemPayload>
+          }
+          update: {
+            args: Prisma.MathProblemUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MathProblemPayload>
+          }
+          deleteMany: {
+            args: Prisma.MathProblemDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.MathProblemUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.MathProblemUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MathProblemPayload>[]
+          }
+          upsert: {
+            args: Prisma.MathProblemUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MathProblemPayload>
+          }
+          aggregate: {
+            args: Prisma.MathProblemAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateMathProblem>
+          }
+          groupBy: {
+            args: Prisma.MathProblemGroupByArgs<ExtArgs>
+            result: $Utils.Optional<MathProblemGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.MathProblemCountArgs<ExtArgs>
+            result: $Utils.Optional<MathProblemCountAggregateOutputType> | number
           }
         }
       }
@@ -1045,6 +1135,7 @@ export namespace Prisma {
   }
   export type GlobalOmitConfig = {
     word?: WordOmit
+    mathProblem?: MathProblemOmit
     game?: GameOmit
     userProgress?: UserProgressOmit
     score?: ScoreOmit
@@ -1142,13 +1233,17 @@ export namespace Prisma {
    */
 
   export type GameCountOutputType = {
-    scores: number
+    words: number
     userProgress: number
+    mathProblems: number
+    scores: number
   }
 
   export type GameCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    scores?: boolean | GameCountOutputTypeCountScoresArgs
+    words?: boolean | GameCountOutputTypeCountWordsArgs
     userProgress?: boolean | GameCountOutputTypeCountUserProgressArgs
+    mathProblems?: boolean | GameCountOutputTypeCountMathProblemsArgs
+    scores?: boolean | GameCountOutputTypeCountScoresArgs
   }
 
   // Custom InputTypes
@@ -1165,8 +1260,8 @@ export namespace Prisma {
   /**
    * GameCountOutputType without action
    */
-  export type GameCountOutputTypeCountScoresArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: ScoreWhereInput
+  export type GameCountOutputTypeCountWordsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: WordWhereInput
   }
 
   /**
@@ -1174,6 +1269,20 @@ export namespace Prisma {
    */
   export type GameCountOutputTypeCountUserProgressArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: UserProgressWhereInput
+  }
+
+  /**
+   * GameCountOutputType without action
+   */
+  export type GameCountOutputTypeCountMathProblemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MathProblemWhereInput
+  }
+
+  /**
+   * GameCountOutputType without action
+   */
+  export type GameCountOutputTypeCountScoresArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ScoreWhereInput
   }
 
 
@@ -1196,11 +1305,13 @@ export namespace Prisma {
   export type WordAvgAggregateOutputType = {
     id: number | null
     level: number | null
+    gameId: number | null
   }
 
   export type WordSumAggregateOutputType = {
     id: number | null
     level: number | null
+    gameId: number | null
   }
 
   export type WordMinAggregateOutputType = {
@@ -1208,6 +1319,7 @@ export namespace Prisma {
     answer: string | null
     image: string | null
     level: number | null
+    gameId: number | null
   }
 
   export type WordMaxAggregateOutputType = {
@@ -1215,6 +1327,7 @@ export namespace Prisma {
     answer: string | null
     image: string | null
     level: number | null
+    gameId: number | null
   }
 
   export type WordCountAggregateOutputType = {
@@ -1223,6 +1336,7 @@ export namespace Prisma {
     image: number
     options: number
     level: number
+    gameId: number
     _all: number
   }
 
@@ -1230,11 +1344,13 @@ export namespace Prisma {
   export type WordAvgAggregateInputType = {
     id?: true
     level?: true
+    gameId?: true
   }
 
   export type WordSumAggregateInputType = {
     id?: true
     level?: true
+    gameId?: true
   }
 
   export type WordMinAggregateInputType = {
@@ -1242,6 +1358,7 @@ export namespace Prisma {
     answer?: true
     image?: true
     level?: true
+    gameId?: true
   }
 
   export type WordMaxAggregateInputType = {
@@ -1249,6 +1366,7 @@ export namespace Prisma {
     answer?: true
     image?: true
     level?: true
+    gameId?: true
   }
 
   export type WordCountAggregateInputType = {
@@ -1257,6 +1375,7 @@ export namespace Prisma {
     image?: true
     options?: true
     level?: true
+    gameId?: true
     _all?: true
   }
 
@@ -1352,6 +1471,7 @@ export namespace Prisma {
     image: string
     options: string[]
     level: number
+    gameId: number | null
     _count: WordCountAggregateOutputType | null
     _avg: WordAvgAggregateOutputType | null
     _sum: WordSumAggregateOutputType | null
@@ -1379,6 +1499,8 @@ export namespace Prisma {
     image?: boolean
     options?: boolean
     level?: boolean
+    gameId?: boolean
+    game?: boolean | Word$gameArgs<ExtArgs>
   }, ExtArgs["result"]["word"]>
 
   export type WordSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -1387,6 +1509,8 @@ export namespace Prisma {
     image?: boolean
     options?: boolean
     level?: boolean
+    gameId?: boolean
+    game?: boolean | Word$gameArgs<ExtArgs>
   }, ExtArgs["result"]["word"]>
 
   export type WordSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -1395,6 +1519,8 @@ export namespace Prisma {
     image?: boolean
     options?: boolean
     level?: boolean
+    gameId?: boolean
+    game?: boolean | Word$gameArgs<ExtArgs>
   }, ExtArgs["result"]["word"]>
 
   export type WordSelectScalar = {
@@ -1403,19 +1529,32 @@ export namespace Prisma {
     image?: boolean
     options?: boolean
     level?: boolean
+    gameId?: boolean
   }
 
-  export type WordOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "answer" | "image" | "options" | "level", ExtArgs["result"]["word"]>
+  export type WordOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "answer" | "image" | "options" | "level" | "gameId", ExtArgs["result"]["word"]>
+  export type WordInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    game?: boolean | Word$gameArgs<ExtArgs>
+  }
+  export type WordIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    game?: boolean | Word$gameArgs<ExtArgs>
+  }
+  export type WordIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    game?: boolean | Word$gameArgs<ExtArgs>
+  }
 
   export type $WordPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Word"
-    objects: {}
+    objects: {
+      game: Prisma.$GamePayload<ExtArgs> | null
+    }
     scalars: $Extensions.GetPayloadResult<{
       id: number
       answer: string
       image: string
       options: string[]
       level: number
+      gameId: number | null
     }, ExtArgs["result"]["word"]>
     composites: {}
   }
@@ -1810,6 +1949,7 @@ export namespace Prisma {
    */
   export interface Prisma__WordClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    game<T extends Word$gameArgs<ExtArgs> = {}>(args?: Subset<T, Word$gameArgs<ExtArgs>>): Prisma__GameClient<$Result.GetResult<Prisma.$GamePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1844,6 +1984,7 @@ export namespace Prisma {
     readonly image: FieldRef<"Word", 'String'>
     readonly options: FieldRef<"Word", 'String[]'>
     readonly level: FieldRef<"Word", 'Int'>
+    readonly gameId: FieldRef<"Word", 'Int'>
   }
     
 
@@ -1860,6 +2001,10 @@ export namespace Prisma {
      * Omit specific fields from the Word
      */
     omit?: WordOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WordInclude<ExtArgs> | null
     /**
      * Filter, which Word to fetch.
      */
@@ -1879,6 +2024,10 @@ export namespace Prisma {
      */
     omit?: WordOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WordInclude<ExtArgs> | null
+    /**
      * Filter, which Word to fetch.
      */
     where: WordWhereUniqueInput
@@ -1896,6 +2045,10 @@ export namespace Prisma {
      * Omit specific fields from the Word
      */
     omit?: WordOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WordInclude<ExtArgs> | null
     /**
      * Filter, which Word to fetch.
      */
@@ -1945,6 +2098,10 @@ export namespace Prisma {
      */
     omit?: WordOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WordInclude<ExtArgs> | null
+    /**
      * Filter, which Word to fetch.
      */
     where?: WordWhereInput
@@ -1993,6 +2150,10 @@ export namespace Prisma {
      */
     omit?: WordOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WordInclude<ExtArgs> | null
+    /**
      * Filter, which Words to fetch.
      */
     where?: WordWhereInput
@@ -2036,6 +2197,10 @@ export namespace Prisma {
      */
     omit?: WordOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WordInclude<ExtArgs> | null
+    /**
      * The data needed to create a Word.
      */
     data: XOR<WordCreateInput, WordUncheckedCreateInput>
@@ -2069,6 +2234,10 @@ export namespace Prisma {
      */
     data: WordCreateManyInput | WordCreateManyInput[]
     skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WordIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -2083,6 +2252,10 @@ export namespace Prisma {
      * Omit specific fields from the Word
      */
     omit?: WordOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WordInclude<ExtArgs> | null
     /**
      * The data needed to update a Word.
      */
@@ -2135,6 +2308,10 @@ export namespace Prisma {
      * Limit how many Words to update.
      */
     limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WordIncludeUpdateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -2149,6 +2326,10 @@ export namespace Prisma {
      * Omit specific fields from the Word
      */
     omit?: WordOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WordInclude<ExtArgs> | null
     /**
      * The filter to search for the Word to update in case it exists.
      */
@@ -2176,6 +2357,10 @@ export namespace Prisma {
      */
     omit?: WordOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WordInclude<ExtArgs> | null
+    /**
      * Filter which Word to delete.
      */
     where: WordWhereUniqueInput
@@ -2196,6 +2381,25 @@ export namespace Prisma {
   }
 
   /**
+   * Word.game
+   */
+  export type Word$gameArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Game
+     */
+    select?: GameSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Game
+     */
+    omit?: GameOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GameInclude<ExtArgs> | null
+    where?: GameWhereInput
+  }
+
+  /**
    * Word without action
    */
   export type WordDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2207,6 +2411,1123 @@ export namespace Prisma {
      * Omit specific fields from the Word
      */
     omit?: WordOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WordInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model MathProblem
+   */
+
+  export type AggregateMathProblem = {
+    _count: MathProblemCountAggregateOutputType | null
+    _avg: MathProblemAvgAggregateOutputType | null
+    _sum: MathProblemSumAggregateOutputType | null
+    _min: MathProblemMinAggregateOutputType | null
+    _max: MathProblemMaxAggregateOutputType | null
+  }
+
+  export type MathProblemAvgAggregateOutputType = {
+    id: number | null
+    answer: number | null
+    level: number | null
+    gameId: number | null
+  }
+
+  export type MathProblemSumAggregateOutputType = {
+    id: number | null
+    answer: number | null
+    level: number | null
+    gameId: number | null
+  }
+
+  export type MathProblemMinAggregateOutputType = {
+    id: number | null
+    problem: string | null
+    answer: number | null
+    level: number | null
+    gameId: number | null
+  }
+
+  export type MathProblemMaxAggregateOutputType = {
+    id: number | null
+    problem: string | null
+    answer: number | null
+    level: number | null
+    gameId: number | null
+  }
+
+  export type MathProblemCountAggregateOutputType = {
+    id: number
+    problem: number
+    answer: number
+    options: number
+    level: number
+    gameId: number
+    _all: number
+  }
+
+
+  export type MathProblemAvgAggregateInputType = {
+    id?: true
+    answer?: true
+    level?: true
+    gameId?: true
+  }
+
+  export type MathProblemSumAggregateInputType = {
+    id?: true
+    answer?: true
+    level?: true
+    gameId?: true
+  }
+
+  export type MathProblemMinAggregateInputType = {
+    id?: true
+    problem?: true
+    answer?: true
+    level?: true
+    gameId?: true
+  }
+
+  export type MathProblemMaxAggregateInputType = {
+    id?: true
+    problem?: true
+    answer?: true
+    level?: true
+    gameId?: true
+  }
+
+  export type MathProblemCountAggregateInputType = {
+    id?: true
+    problem?: true
+    answer?: true
+    options?: true
+    level?: true
+    gameId?: true
+    _all?: true
+  }
+
+  export type MathProblemAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MathProblem to aggregate.
+     */
+    where?: MathProblemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MathProblems to fetch.
+     */
+    orderBy?: MathProblemOrderByWithRelationInput | MathProblemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: MathProblemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MathProblems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MathProblems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned MathProblems
+    **/
+    _count?: true | MathProblemCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: MathProblemAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: MathProblemSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: MathProblemMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: MathProblemMaxAggregateInputType
+  }
+
+  export type GetMathProblemAggregateType<T extends MathProblemAggregateArgs> = {
+        [P in keyof T & keyof AggregateMathProblem]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateMathProblem[P]>
+      : GetScalarType<T[P], AggregateMathProblem[P]>
+  }
+
+
+
+
+  export type MathProblemGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MathProblemWhereInput
+    orderBy?: MathProblemOrderByWithAggregationInput | MathProblemOrderByWithAggregationInput[]
+    by: MathProblemScalarFieldEnum[] | MathProblemScalarFieldEnum
+    having?: MathProblemScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: MathProblemCountAggregateInputType | true
+    _avg?: MathProblemAvgAggregateInputType
+    _sum?: MathProblemSumAggregateInputType
+    _min?: MathProblemMinAggregateInputType
+    _max?: MathProblemMaxAggregateInputType
+  }
+
+  export type MathProblemGroupByOutputType = {
+    id: number
+    problem: string
+    answer: number
+    options: JsonValue
+    level: number
+    gameId: number
+    _count: MathProblemCountAggregateOutputType | null
+    _avg: MathProblemAvgAggregateOutputType | null
+    _sum: MathProblemSumAggregateOutputType | null
+    _min: MathProblemMinAggregateOutputType | null
+    _max: MathProblemMaxAggregateOutputType | null
+  }
+
+  type GetMathProblemGroupByPayload<T extends MathProblemGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<MathProblemGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof MathProblemGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], MathProblemGroupByOutputType[P]>
+            : GetScalarType<T[P], MathProblemGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type MathProblemSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    problem?: boolean
+    answer?: boolean
+    options?: boolean
+    level?: boolean
+    gameId?: boolean
+    game?: boolean | GameDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["mathProblem"]>
+
+  export type MathProblemSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    problem?: boolean
+    answer?: boolean
+    options?: boolean
+    level?: boolean
+    gameId?: boolean
+    game?: boolean | GameDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["mathProblem"]>
+
+  export type MathProblemSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    problem?: boolean
+    answer?: boolean
+    options?: boolean
+    level?: boolean
+    gameId?: boolean
+    game?: boolean | GameDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["mathProblem"]>
+
+  export type MathProblemSelectScalar = {
+    id?: boolean
+    problem?: boolean
+    answer?: boolean
+    options?: boolean
+    level?: boolean
+    gameId?: boolean
+  }
+
+  export type MathProblemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "problem" | "answer" | "options" | "level" | "gameId", ExtArgs["result"]["mathProblem"]>
+  export type MathProblemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    game?: boolean | GameDefaultArgs<ExtArgs>
+  }
+  export type MathProblemIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    game?: boolean | GameDefaultArgs<ExtArgs>
+  }
+  export type MathProblemIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    game?: boolean | GameDefaultArgs<ExtArgs>
+  }
+
+  export type $MathProblemPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "MathProblem"
+    objects: {
+      game: Prisma.$GamePayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      problem: string
+      answer: number
+      options: Prisma.JsonValue
+      level: number
+      gameId: number
+    }, ExtArgs["result"]["mathProblem"]>
+    composites: {}
+  }
+
+  type MathProblemGetPayload<S extends boolean | null | undefined | MathProblemDefaultArgs> = $Result.GetResult<Prisma.$MathProblemPayload, S>
+
+  type MathProblemCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<MathProblemFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: MathProblemCountAggregateInputType | true
+    }
+
+  export interface MathProblemDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['MathProblem'], meta: { name: 'MathProblem' } }
+    /**
+     * Find zero or one MathProblem that matches the filter.
+     * @param {MathProblemFindUniqueArgs} args - Arguments to find a MathProblem
+     * @example
+     * // Get one MathProblem
+     * const mathProblem = await prisma.mathProblem.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends MathProblemFindUniqueArgs>(args: SelectSubset<T, MathProblemFindUniqueArgs<ExtArgs>>): Prisma__MathProblemClient<$Result.GetResult<Prisma.$MathProblemPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one MathProblem that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {MathProblemFindUniqueOrThrowArgs} args - Arguments to find a MathProblem
+     * @example
+     * // Get one MathProblem
+     * const mathProblem = await prisma.mathProblem.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends MathProblemFindUniqueOrThrowArgs>(args: SelectSubset<T, MathProblemFindUniqueOrThrowArgs<ExtArgs>>): Prisma__MathProblemClient<$Result.GetResult<Prisma.$MathProblemPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MathProblem that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MathProblemFindFirstArgs} args - Arguments to find a MathProblem
+     * @example
+     * // Get one MathProblem
+     * const mathProblem = await prisma.mathProblem.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends MathProblemFindFirstArgs>(args?: SelectSubset<T, MathProblemFindFirstArgs<ExtArgs>>): Prisma__MathProblemClient<$Result.GetResult<Prisma.$MathProblemPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MathProblem that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MathProblemFindFirstOrThrowArgs} args - Arguments to find a MathProblem
+     * @example
+     * // Get one MathProblem
+     * const mathProblem = await prisma.mathProblem.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends MathProblemFindFirstOrThrowArgs>(args?: SelectSubset<T, MathProblemFindFirstOrThrowArgs<ExtArgs>>): Prisma__MathProblemClient<$Result.GetResult<Prisma.$MathProblemPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more MathProblems that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MathProblemFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all MathProblems
+     * const mathProblems = await prisma.mathProblem.findMany()
+     * 
+     * // Get first 10 MathProblems
+     * const mathProblems = await prisma.mathProblem.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const mathProblemWithIdOnly = await prisma.mathProblem.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends MathProblemFindManyArgs>(args?: SelectSubset<T, MathProblemFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MathProblemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a MathProblem.
+     * @param {MathProblemCreateArgs} args - Arguments to create a MathProblem.
+     * @example
+     * // Create one MathProblem
+     * const MathProblem = await prisma.mathProblem.create({
+     *   data: {
+     *     // ... data to create a MathProblem
+     *   }
+     * })
+     * 
+     */
+    create<T extends MathProblemCreateArgs>(args: SelectSubset<T, MathProblemCreateArgs<ExtArgs>>): Prisma__MathProblemClient<$Result.GetResult<Prisma.$MathProblemPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many MathProblems.
+     * @param {MathProblemCreateManyArgs} args - Arguments to create many MathProblems.
+     * @example
+     * // Create many MathProblems
+     * const mathProblem = await prisma.mathProblem.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends MathProblemCreateManyArgs>(args?: SelectSubset<T, MathProblemCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many MathProblems and returns the data saved in the database.
+     * @param {MathProblemCreateManyAndReturnArgs} args - Arguments to create many MathProblems.
+     * @example
+     * // Create many MathProblems
+     * const mathProblem = await prisma.mathProblem.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many MathProblems and only return the `id`
+     * const mathProblemWithIdOnly = await prisma.mathProblem.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends MathProblemCreateManyAndReturnArgs>(args?: SelectSubset<T, MathProblemCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MathProblemPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a MathProblem.
+     * @param {MathProblemDeleteArgs} args - Arguments to delete one MathProblem.
+     * @example
+     * // Delete one MathProblem
+     * const MathProblem = await prisma.mathProblem.delete({
+     *   where: {
+     *     // ... filter to delete one MathProblem
+     *   }
+     * })
+     * 
+     */
+    delete<T extends MathProblemDeleteArgs>(args: SelectSubset<T, MathProblemDeleteArgs<ExtArgs>>): Prisma__MathProblemClient<$Result.GetResult<Prisma.$MathProblemPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one MathProblem.
+     * @param {MathProblemUpdateArgs} args - Arguments to update one MathProblem.
+     * @example
+     * // Update one MathProblem
+     * const mathProblem = await prisma.mathProblem.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends MathProblemUpdateArgs>(args: SelectSubset<T, MathProblemUpdateArgs<ExtArgs>>): Prisma__MathProblemClient<$Result.GetResult<Prisma.$MathProblemPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more MathProblems.
+     * @param {MathProblemDeleteManyArgs} args - Arguments to filter MathProblems to delete.
+     * @example
+     * // Delete a few MathProblems
+     * const { count } = await prisma.mathProblem.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends MathProblemDeleteManyArgs>(args?: SelectSubset<T, MathProblemDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MathProblems.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MathProblemUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many MathProblems
+     * const mathProblem = await prisma.mathProblem.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends MathProblemUpdateManyArgs>(args: SelectSubset<T, MathProblemUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MathProblems and returns the data updated in the database.
+     * @param {MathProblemUpdateManyAndReturnArgs} args - Arguments to update many MathProblems.
+     * @example
+     * // Update many MathProblems
+     * const mathProblem = await prisma.mathProblem.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more MathProblems and only return the `id`
+     * const mathProblemWithIdOnly = await prisma.mathProblem.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends MathProblemUpdateManyAndReturnArgs>(args: SelectSubset<T, MathProblemUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MathProblemPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one MathProblem.
+     * @param {MathProblemUpsertArgs} args - Arguments to update or create a MathProblem.
+     * @example
+     * // Update or create a MathProblem
+     * const mathProblem = await prisma.mathProblem.upsert({
+     *   create: {
+     *     // ... data to create a MathProblem
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the MathProblem we want to update
+     *   }
+     * })
+     */
+    upsert<T extends MathProblemUpsertArgs>(args: SelectSubset<T, MathProblemUpsertArgs<ExtArgs>>): Prisma__MathProblemClient<$Result.GetResult<Prisma.$MathProblemPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of MathProblems.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MathProblemCountArgs} args - Arguments to filter MathProblems to count.
+     * @example
+     * // Count the number of MathProblems
+     * const count = await prisma.mathProblem.count({
+     *   where: {
+     *     // ... the filter for the MathProblems we want to count
+     *   }
+     * })
+    **/
+    count<T extends MathProblemCountArgs>(
+      args?: Subset<T, MathProblemCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], MathProblemCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a MathProblem.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MathProblemAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends MathProblemAggregateArgs>(args: Subset<T, MathProblemAggregateArgs>): Prisma.PrismaPromise<GetMathProblemAggregateType<T>>
+
+    /**
+     * Group by MathProblem.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MathProblemGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends MathProblemGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: MathProblemGroupByArgs['orderBy'] }
+        : { orderBy?: MathProblemGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, MathProblemGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetMathProblemGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the MathProblem model
+   */
+  readonly fields: MathProblemFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for MathProblem.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__MathProblemClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    game<T extends GameDefaultArgs<ExtArgs> = {}>(args?: Subset<T, GameDefaultArgs<ExtArgs>>): Prisma__GameClient<$Result.GetResult<Prisma.$GamePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the MathProblem model
+   */
+  interface MathProblemFieldRefs {
+    readonly id: FieldRef<"MathProblem", 'Int'>
+    readonly problem: FieldRef<"MathProblem", 'String'>
+    readonly answer: FieldRef<"MathProblem", 'Int'>
+    readonly options: FieldRef<"MathProblem", 'Json'>
+    readonly level: FieldRef<"MathProblem", 'Int'>
+    readonly gameId: FieldRef<"MathProblem", 'Int'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * MathProblem findUnique
+   */
+  export type MathProblemFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MathProblem
+     */
+    select?: MathProblemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MathProblem
+     */
+    omit?: MathProblemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MathProblemInclude<ExtArgs> | null
+    /**
+     * Filter, which MathProblem to fetch.
+     */
+    where: MathProblemWhereUniqueInput
+  }
+
+  /**
+   * MathProblem findUniqueOrThrow
+   */
+  export type MathProblemFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MathProblem
+     */
+    select?: MathProblemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MathProblem
+     */
+    omit?: MathProblemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MathProblemInclude<ExtArgs> | null
+    /**
+     * Filter, which MathProblem to fetch.
+     */
+    where: MathProblemWhereUniqueInput
+  }
+
+  /**
+   * MathProblem findFirst
+   */
+  export type MathProblemFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MathProblem
+     */
+    select?: MathProblemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MathProblem
+     */
+    omit?: MathProblemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MathProblemInclude<ExtArgs> | null
+    /**
+     * Filter, which MathProblem to fetch.
+     */
+    where?: MathProblemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MathProblems to fetch.
+     */
+    orderBy?: MathProblemOrderByWithRelationInput | MathProblemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MathProblems.
+     */
+    cursor?: MathProblemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MathProblems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MathProblems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MathProblems.
+     */
+    distinct?: MathProblemScalarFieldEnum | MathProblemScalarFieldEnum[]
+  }
+
+  /**
+   * MathProblem findFirstOrThrow
+   */
+  export type MathProblemFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MathProblem
+     */
+    select?: MathProblemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MathProblem
+     */
+    omit?: MathProblemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MathProblemInclude<ExtArgs> | null
+    /**
+     * Filter, which MathProblem to fetch.
+     */
+    where?: MathProblemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MathProblems to fetch.
+     */
+    orderBy?: MathProblemOrderByWithRelationInput | MathProblemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MathProblems.
+     */
+    cursor?: MathProblemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MathProblems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MathProblems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MathProblems.
+     */
+    distinct?: MathProblemScalarFieldEnum | MathProblemScalarFieldEnum[]
+  }
+
+  /**
+   * MathProblem findMany
+   */
+  export type MathProblemFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MathProblem
+     */
+    select?: MathProblemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MathProblem
+     */
+    omit?: MathProblemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MathProblemInclude<ExtArgs> | null
+    /**
+     * Filter, which MathProblems to fetch.
+     */
+    where?: MathProblemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MathProblems to fetch.
+     */
+    orderBy?: MathProblemOrderByWithRelationInput | MathProblemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing MathProblems.
+     */
+    cursor?: MathProblemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MathProblems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MathProblems.
+     */
+    skip?: number
+    distinct?: MathProblemScalarFieldEnum | MathProblemScalarFieldEnum[]
+  }
+
+  /**
+   * MathProblem create
+   */
+  export type MathProblemCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MathProblem
+     */
+    select?: MathProblemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MathProblem
+     */
+    omit?: MathProblemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MathProblemInclude<ExtArgs> | null
+    /**
+     * The data needed to create a MathProblem.
+     */
+    data: XOR<MathProblemCreateInput, MathProblemUncheckedCreateInput>
+  }
+
+  /**
+   * MathProblem createMany
+   */
+  export type MathProblemCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many MathProblems.
+     */
+    data: MathProblemCreateManyInput | MathProblemCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * MathProblem createManyAndReturn
+   */
+  export type MathProblemCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MathProblem
+     */
+    select?: MathProblemSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the MathProblem
+     */
+    omit?: MathProblemOmit<ExtArgs> | null
+    /**
+     * The data used to create many MathProblems.
+     */
+    data: MathProblemCreateManyInput | MathProblemCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MathProblemIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * MathProblem update
+   */
+  export type MathProblemUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MathProblem
+     */
+    select?: MathProblemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MathProblem
+     */
+    omit?: MathProblemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MathProblemInclude<ExtArgs> | null
+    /**
+     * The data needed to update a MathProblem.
+     */
+    data: XOR<MathProblemUpdateInput, MathProblemUncheckedUpdateInput>
+    /**
+     * Choose, which MathProblem to update.
+     */
+    where: MathProblemWhereUniqueInput
+  }
+
+  /**
+   * MathProblem updateMany
+   */
+  export type MathProblemUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update MathProblems.
+     */
+    data: XOR<MathProblemUpdateManyMutationInput, MathProblemUncheckedUpdateManyInput>
+    /**
+     * Filter which MathProblems to update
+     */
+    where?: MathProblemWhereInput
+    /**
+     * Limit how many MathProblems to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * MathProblem updateManyAndReturn
+   */
+  export type MathProblemUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MathProblem
+     */
+    select?: MathProblemSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the MathProblem
+     */
+    omit?: MathProblemOmit<ExtArgs> | null
+    /**
+     * The data used to update MathProblems.
+     */
+    data: XOR<MathProblemUpdateManyMutationInput, MathProblemUncheckedUpdateManyInput>
+    /**
+     * Filter which MathProblems to update
+     */
+    where?: MathProblemWhereInput
+    /**
+     * Limit how many MathProblems to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MathProblemIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * MathProblem upsert
+   */
+  export type MathProblemUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MathProblem
+     */
+    select?: MathProblemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MathProblem
+     */
+    omit?: MathProblemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MathProblemInclude<ExtArgs> | null
+    /**
+     * The filter to search for the MathProblem to update in case it exists.
+     */
+    where: MathProblemWhereUniqueInput
+    /**
+     * In case the MathProblem found by the `where` argument doesn't exist, create a new MathProblem with this data.
+     */
+    create: XOR<MathProblemCreateInput, MathProblemUncheckedCreateInput>
+    /**
+     * In case the MathProblem was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<MathProblemUpdateInput, MathProblemUncheckedUpdateInput>
+  }
+
+  /**
+   * MathProblem delete
+   */
+  export type MathProblemDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MathProblem
+     */
+    select?: MathProblemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MathProblem
+     */
+    omit?: MathProblemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MathProblemInclude<ExtArgs> | null
+    /**
+     * Filter which MathProblem to delete.
+     */
+    where: MathProblemWhereUniqueInput
+  }
+
+  /**
+   * MathProblem deleteMany
+   */
+  export type MathProblemDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MathProblems to delete
+     */
+    where?: MathProblemWhereInput
+    /**
+     * Limit how many MathProblems to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * MathProblem without action
+   */
+  export type MathProblemDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MathProblem
+     */
+    select?: MathProblemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MathProblem
+     */
+    omit?: MathProblemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MathProblemInclude<ExtArgs> | null
   }
 
 
@@ -2384,8 +3705,10 @@ export namespace Prisma {
   export type GameSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     name?: boolean
-    scores?: boolean | Game$scoresArgs<ExtArgs>
+    words?: boolean | Game$wordsArgs<ExtArgs>
     userProgress?: boolean | Game$userProgressArgs<ExtArgs>
+    mathProblems?: boolean | Game$mathProblemsArgs<ExtArgs>
+    scores?: boolean | Game$scoresArgs<ExtArgs>
     _count?: boolean | GameCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["game"]>
 
@@ -2406,8 +3729,10 @@ export namespace Prisma {
 
   export type GameOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name", ExtArgs["result"]["game"]>
   export type GameInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    scores?: boolean | Game$scoresArgs<ExtArgs>
+    words?: boolean | Game$wordsArgs<ExtArgs>
     userProgress?: boolean | Game$userProgressArgs<ExtArgs>
+    mathProblems?: boolean | Game$mathProblemsArgs<ExtArgs>
+    scores?: boolean | Game$scoresArgs<ExtArgs>
     _count?: boolean | GameCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type GameIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -2416,8 +3741,10 @@ export namespace Prisma {
   export type $GamePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Game"
     objects: {
-      scores: Prisma.$ScorePayload<ExtArgs>[]
+      words: Prisma.$WordPayload<ExtArgs>[]
       userProgress: Prisma.$UserProgressPayload<ExtArgs>[]
+      mathProblems: Prisma.$MathProblemPayload<ExtArgs>[]
+      scores: Prisma.$ScorePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
@@ -2816,8 +4143,10 @@ export namespace Prisma {
    */
   export interface Prisma__GameClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    scores<T extends Game$scoresArgs<ExtArgs> = {}>(args?: Subset<T, Game$scoresArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ScorePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    words<T extends Game$wordsArgs<ExtArgs> = {}>(args?: Subset<T, Game$wordsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WordPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     userProgress<T extends Game$userProgressArgs<ExtArgs> = {}>(args?: Subset<T, Game$userProgressArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserProgressPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    mathProblems<T extends Game$mathProblemsArgs<ExtArgs> = {}>(args?: Subset<T, Game$mathProblemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MathProblemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    scores<T extends Game$scoresArgs<ExtArgs> = {}>(args?: Subset<T, Game$scoresArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ScorePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3237,27 +4566,27 @@ export namespace Prisma {
   }
 
   /**
-   * Game.scores
+   * Game.words
    */
-  export type Game$scoresArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type Game$wordsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Score
+     * Select specific fields to fetch from the Word
      */
-    select?: ScoreSelect<ExtArgs> | null
+    select?: WordSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the Score
+     * Omit specific fields from the Word
      */
-    omit?: ScoreOmit<ExtArgs> | null
+    omit?: WordOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: ScoreInclude<ExtArgs> | null
-    where?: ScoreWhereInput
-    orderBy?: ScoreOrderByWithRelationInput | ScoreOrderByWithRelationInput[]
-    cursor?: ScoreWhereUniqueInput
+    include?: WordInclude<ExtArgs> | null
+    where?: WordWhereInput
+    orderBy?: WordOrderByWithRelationInput | WordOrderByWithRelationInput[]
+    cursor?: WordWhereUniqueInput
     take?: number
     skip?: number
-    distinct?: ScoreScalarFieldEnum | ScoreScalarFieldEnum[]
+    distinct?: WordScalarFieldEnum | WordScalarFieldEnum[]
   }
 
   /**
@@ -3282,6 +4611,54 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: UserProgressScalarFieldEnum | UserProgressScalarFieldEnum[]
+  }
+
+  /**
+   * Game.mathProblems
+   */
+  export type Game$mathProblemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MathProblem
+     */
+    select?: MathProblemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MathProblem
+     */
+    omit?: MathProblemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MathProblemInclude<ExtArgs> | null
+    where?: MathProblemWhereInput
+    orderBy?: MathProblemOrderByWithRelationInput | MathProblemOrderByWithRelationInput[]
+    cursor?: MathProblemWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: MathProblemScalarFieldEnum | MathProblemScalarFieldEnum[]
+  }
+
+  /**
+   * Game.scores
+   */
+  export type Game$scoresArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Score
+     */
+    select?: ScoreSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Score
+     */
+    omit?: ScoreOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScoreInclude<ExtArgs> | null
+    where?: ScoreWhereInput
+    orderBy?: ScoreOrderByWithRelationInput | ScoreOrderByWithRelationInput[]
+    cursor?: ScoreWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ScoreScalarFieldEnum | ScoreScalarFieldEnum[]
   }
 
   /**
@@ -5526,10 +6903,23 @@ export namespace Prisma {
     answer: 'answer',
     image: 'image',
     options: 'options',
-    level: 'level'
+    level: 'level',
+    gameId: 'gameId'
   };
 
   export type WordScalarFieldEnum = (typeof WordScalarFieldEnum)[keyof typeof WordScalarFieldEnum]
+
+
+  export const MathProblemScalarFieldEnum: {
+    id: 'id',
+    problem: 'problem',
+    answer: 'answer',
+    options: 'options',
+    level: 'level',
+    gameId: 'gameId'
+  };
+
+  export type MathProblemScalarFieldEnum = (typeof MathProblemScalarFieldEnum)[keyof typeof MathProblemScalarFieldEnum]
 
 
   export const GameScalarFieldEnum: {
@@ -5570,12 +6960,36 @@ export namespace Prisma {
   export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+  export const JsonNullValueInput: {
+    JsonNull: typeof JsonNull
+  };
+
+  export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
   export const QueryMode: {
     default: 'default',
     insensitive: 'insensitive'
   };
 
   export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
+
+
+  export const NullsOrder: {
+    first: 'first',
+    last: 'last'
+  };
+
+  export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+  export const JsonNullValueFilter: {
+    DbNull: typeof DbNull,
+    JsonNull: typeof JsonNull,
+    AnyNull: typeof AnyNull
+  };
+
+  export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
   /**
@@ -5608,6 +7022,20 @@ export namespace Prisma {
    * Reference to a field of type 'String[]'
    */
   export type ListStringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'String[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Json'
+   */
+  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+  /**
+   * Reference to a field of type 'QueryMode'
+   */
+  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 
@@ -5651,6 +7079,8 @@ export namespace Prisma {
     image?: StringFilter<"Word"> | string
     options?: StringNullableListFilter<"Word">
     level?: IntFilter<"Word"> | number
+    gameId?: IntNullableFilter<"Word"> | number | null
+    game?: XOR<GameNullableScalarRelationFilter, GameWhereInput> | null
   }
 
   export type WordOrderByWithRelationInput = {
@@ -5659,10 +7089,13 @@ export namespace Prisma {
     image?: SortOrder
     options?: SortOrder
     level?: SortOrder
+    gameId?: SortOrderInput | SortOrder
+    game?: GameOrderByWithRelationInput
   }
 
   export type WordWhereUniqueInput = Prisma.AtLeast<{
     id?: number
+    gameId_answer?: WordGameIdAnswerCompoundUniqueInput
     AND?: WordWhereInput | WordWhereInput[]
     OR?: WordWhereInput[]
     NOT?: WordWhereInput | WordWhereInput[]
@@ -5670,7 +7103,9 @@ export namespace Prisma {
     image?: StringFilter<"Word"> | string
     options?: StringNullableListFilter<"Word">
     level?: IntFilter<"Word"> | number
-  }, "id">
+    gameId?: IntNullableFilter<"Word"> | number | null
+    game?: XOR<GameNullableScalarRelationFilter, GameWhereInput> | null
+  }, "id" | "gameId_answer">
 
   export type WordOrderByWithAggregationInput = {
     id?: SortOrder
@@ -5678,6 +7113,7 @@ export namespace Prisma {
     image?: SortOrder
     options?: SortOrder
     level?: SortOrder
+    gameId?: SortOrderInput | SortOrder
     _count?: WordCountOrderByAggregateInput
     _avg?: WordAvgOrderByAggregateInput
     _max?: WordMaxOrderByAggregateInput
@@ -5694,6 +7130,69 @@ export namespace Prisma {
     image?: StringWithAggregatesFilter<"Word"> | string
     options?: StringNullableListFilter<"Word">
     level?: IntWithAggregatesFilter<"Word"> | number
+    gameId?: IntNullableWithAggregatesFilter<"Word"> | number | null
+  }
+
+  export type MathProblemWhereInput = {
+    AND?: MathProblemWhereInput | MathProblemWhereInput[]
+    OR?: MathProblemWhereInput[]
+    NOT?: MathProblemWhereInput | MathProblemWhereInput[]
+    id?: IntFilter<"MathProblem"> | number
+    problem?: StringFilter<"MathProblem"> | string
+    answer?: IntFilter<"MathProblem"> | number
+    options?: JsonFilter<"MathProblem">
+    level?: IntFilter<"MathProblem"> | number
+    gameId?: IntFilter<"MathProblem"> | number
+    game?: XOR<GameScalarRelationFilter, GameWhereInput>
+  }
+
+  export type MathProblemOrderByWithRelationInput = {
+    id?: SortOrder
+    problem?: SortOrder
+    answer?: SortOrder
+    options?: SortOrder
+    level?: SortOrder
+    gameId?: SortOrder
+    game?: GameOrderByWithRelationInput
+  }
+
+  export type MathProblemWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    problem?: string
+    AND?: MathProblemWhereInput | MathProblemWhereInput[]
+    OR?: MathProblemWhereInput[]
+    NOT?: MathProblemWhereInput | MathProblemWhereInput[]
+    answer?: IntFilter<"MathProblem"> | number
+    options?: JsonFilter<"MathProblem">
+    level?: IntFilter<"MathProblem"> | number
+    gameId?: IntFilter<"MathProblem"> | number
+    game?: XOR<GameScalarRelationFilter, GameWhereInput>
+  }, "id" | "problem">
+
+  export type MathProblemOrderByWithAggregationInput = {
+    id?: SortOrder
+    problem?: SortOrder
+    answer?: SortOrder
+    options?: SortOrder
+    level?: SortOrder
+    gameId?: SortOrder
+    _count?: MathProblemCountOrderByAggregateInput
+    _avg?: MathProblemAvgOrderByAggregateInput
+    _max?: MathProblemMaxOrderByAggregateInput
+    _min?: MathProblemMinOrderByAggregateInput
+    _sum?: MathProblemSumOrderByAggregateInput
+  }
+
+  export type MathProblemScalarWhereWithAggregatesInput = {
+    AND?: MathProblemScalarWhereWithAggregatesInput | MathProblemScalarWhereWithAggregatesInput[]
+    OR?: MathProblemScalarWhereWithAggregatesInput[]
+    NOT?: MathProblemScalarWhereWithAggregatesInput | MathProblemScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"MathProblem"> | number
+    problem?: StringWithAggregatesFilter<"MathProblem"> | string
+    answer?: IntWithAggregatesFilter<"MathProblem"> | number
+    options?: JsonWithAggregatesFilter<"MathProblem">
+    level?: IntWithAggregatesFilter<"MathProblem"> | number
+    gameId?: IntWithAggregatesFilter<"MathProblem"> | number
   }
 
   export type GameWhereInput = {
@@ -5702,15 +7201,19 @@ export namespace Prisma {
     NOT?: GameWhereInput | GameWhereInput[]
     id?: IntFilter<"Game"> | number
     name?: StringFilter<"Game"> | string
-    scores?: ScoreListRelationFilter
+    words?: WordListRelationFilter
     userProgress?: UserProgressListRelationFilter
+    mathProblems?: MathProblemListRelationFilter
+    scores?: ScoreListRelationFilter
   }
 
   export type GameOrderByWithRelationInput = {
     id?: SortOrder
     name?: SortOrder
-    scores?: ScoreOrderByRelationAggregateInput
+    words?: WordOrderByRelationAggregateInput
     userProgress?: UserProgressOrderByRelationAggregateInput
+    mathProblems?: MathProblemOrderByRelationAggregateInput
+    scores?: ScoreOrderByRelationAggregateInput
   }
 
   export type GameWhereUniqueInput = Prisma.AtLeast<{
@@ -5719,8 +7222,10 @@ export namespace Prisma {
     AND?: GameWhereInput | GameWhereInput[]
     OR?: GameWhereInput[]
     NOT?: GameWhereInput | GameWhereInput[]
-    scores?: ScoreListRelationFilter
+    words?: WordListRelationFilter
     userProgress?: UserProgressListRelationFilter
+    mathProblems?: MathProblemListRelationFilter
+    scores?: ScoreListRelationFilter
   }, "id" | "name">
 
   export type GameOrderByWithAggregationInput = {
@@ -5861,6 +7366,7 @@ export namespace Prisma {
     image: string
     options?: WordCreateoptionsInput | string[]
     level: number
+    game?: GameCreateNestedOneWithoutWordsInput
   }
 
   export type WordUncheckedCreateInput = {
@@ -5869,6 +7375,7 @@ export namespace Prisma {
     image: string
     options?: WordCreateoptionsInput | string[]
     level: number
+    gameId?: number | null
   }
 
   export type WordUpdateInput = {
@@ -5876,6 +7383,7 @@ export namespace Prisma {
     image?: StringFieldUpdateOperationsInput | string
     options?: WordUpdateoptionsInput | string[]
     level?: IntFieldUpdateOperationsInput | number
+    game?: GameUpdateOneWithoutWordsNestedInput
   }
 
   export type WordUncheckedUpdateInput = {
@@ -5884,6 +7392,7 @@ export namespace Prisma {
     image?: StringFieldUpdateOperationsInput | string
     options?: WordUpdateoptionsInput | string[]
     level?: IntFieldUpdateOperationsInput | number
+    gameId?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
   export type WordCreateManyInput = {
@@ -5892,6 +7401,7 @@ export namespace Prisma {
     image: string
     options?: WordCreateoptionsInput | string[]
     level: number
+    gameId?: number | null
   }
 
   export type WordUpdateManyMutationInput = {
@@ -5907,32 +7417,100 @@ export namespace Prisma {
     image?: StringFieldUpdateOperationsInput | string
     options?: WordUpdateoptionsInput | string[]
     level?: IntFieldUpdateOperationsInput | number
+    gameId?: NullableIntFieldUpdateOperationsInput | number | null
+  }
+
+  export type MathProblemCreateInput = {
+    problem: string
+    answer: number
+    options: JsonNullValueInput | InputJsonValue
+    level: number
+    game: GameCreateNestedOneWithoutMathProblemsInput
+  }
+
+  export type MathProblemUncheckedCreateInput = {
+    id?: number
+    problem: string
+    answer: number
+    options: JsonNullValueInput | InputJsonValue
+    level: number
+    gameId: number
+  }
+
+  export type MathProblemUpdateInput = {
+    problem?: StringFieldUpdateOperationsInput | string
+    answer?: IntFieldUpdateOperationsInput | number
+    options?: JsonNullValueInput | InputJsonValue
+    level?: IntFieldUpdateOperationsInput | number
+    game?: GameUpdateOneRequiredWithoutMathProblemsNestedInput
+  }
+
+  export type MathProblemUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    problem?: StringFieldUpdateOperationsInput | string
+    answer?: IntFieldUpdateOperationsInput | number
+    options?: JsonNullValueInput | InputJsonValue
+    level?: IntFieldUpdateOperationsInput | number
+    gameId?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type MathProblemCreateManyInput = {
+    id?: number
+    problem: string
+    answer: number
+    options: JsonNullValueInput | InputJsonValue
+    level: number
+    gameId: number
+  }
+
+  export type MathProblemUpdateManyMutationInput = {
+    problem?: StringFieldUpdateOperationsInput | string
+    answer?: IntFieldUpdateOperationsInput | number
+    options?: JsonNullValueInput | InputJsonValue
+    level?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type MathProblemUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    problem?: StringFieldUpdateOperationsInput | string
+    answer?: IntFieldUpdateOperationsInput | number
+    options?: JsonNullValueInput | InputJsonValue
+    level?: IntFieldUpdateOperationsInput | number
+    gameId?: IntFieldUpdateOperationsInput | number
   }
 
   export type GameCreateInput = {
     name: string
-    scores?: ScoreCreateNestedManyWithoutGameInput
+    words?: WordCreateNestedManyWithoutGameInput
     userProgress?: UserProgressCreateNestedManyWithoutGameInput
+    mathProblems?: MathProblemCreateNestedManyWithoutGameInput
+    scores?: ScoreCreateNestedManyWithoutGameInput
   }
 
   export type GameUncheckedCreateInput = {
     id?: number
     name: string
-    scores?: ScoreUncheckedCreateNestedManyWithoutGameInput
+    words?: WordUncheckedCreateNestedManyWithoutGameInput
     userProgress?: UserProgressUncheckedCreateNestedManyWithoutGameInput
+    mathProblems?: MathProblemUncheckedCreateNestedManyWithoutGameInput
+    scores?: ScoreUncheckedCreateNestedManyWithoutGameInput
   }
 
   export type GameUpdateInput = {
     name?: StringFieldUpdateOperationsInput | string
-    scores?: ScoreUpdateManyWithoutGameNestedInput
+    words?: WordUpdateManyWithoutGameNestedInput
     userProgress?: UserProgressUpdateManyWithoutGameNestedInput
+    mathProblems?: MathProblemUpdateManyWithoutGameNestedInput
+    scores?: ScoreUpdateManyWithoutGameNestedInput
   }
 
   export type GameUncheckedUpdateInput = {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
-    scores?: ScoreUncheckedUpdateManyWithoutGameNestedInput
+    words?: WordUncheckedUpdateManyWithoutGameNestedInput
     userProgress?: UserProgressUncheckedUpdateManyWithoutGameNestedInput
+    mathProblems?: MathProblemUncheckedUpdateManyWithoutGameNestedInput
+    scores?: ScoreUncheckedUpdateManyWithoutGameNestedInput
   }
 
   export type GameCreateManyInput = {
@@ -6087,17 +7665,45 @@ export namespace Prisma {
     isEmpty?: boolean
   }
 
+  export type IntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type GameNullableScalarRelationFilter = {
+    is?: GameWhereInput | null
+    isNot?: GameWhereInput | null
+  }
+
+  export type SortOrderInput = {
+    sort: SortOrder
+    nulls?: NullsOrder
+  }
+
+  export type WordGameIdAnswerCompoundUniqueInput = {
+    gameId: number
+    answer: string
+  }
+
   export type WordCountOrderByAggregateInput = {
     id?: SortOrder
     answer?: SortOrder
     image?: SortOrder
     options?: SortOrder
     level?: SortOrder
+    gameId?: SortOrder
   }
 
   export type WordAvgOrderByAggregateInput = {
     id?: SortOrder
     level?: SortOrder
+    gameId?: SortOrder
   }
 
   export type WordMaxOrderByAggregateInput = {
@@ -6105,6 +7711,7 @@ export namespace Prisma {
     answer?: SortOrder
     image?: SortOrder
     level?: SortOrder
+    gameId?: SortOrder
   }
 
   export type WordMinOrderByAggregateInput = {
@@ -6112,11 +7719,13 @@ export namespace Prisma {
     answer?: SortOrder
     image?: SortOrder
     level?: SortOrder
+    gameId?: SortOrder
   }
 
   export type WordSumOrderByAggregateInput = {
     id?: SortOrder
     level?: SortOrder
+    gameId?: SortOrder
   }
 
   export type IntWithAggregatesFilter<$PrismaModel = never> = {
@@ -6153,10 +7762,119 @@ export namespace Prisma {
     _max?: NestedStringFilter<$PrismaModel>
   }
 
-  export type ScoreListRelationFilter = {
-    every?: ScoreWhereInput
-    some?: ScoreWhereInput
-    none?: ScoreWhereInput
+  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+  export type JsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type GameScalarRelationFilter = {
+    is?: GameWhereInput
+    isNot?: GameWhereInput
+  }
+
+  export type MathProblemCountOrderByAggregateInput = {
+    id?: SortOrder
+    problem?: SortOrder
+    answer?: SortOrder
+    options?: SortOrder
+    level?: SortOrder
+    gameId?: SortOrder
+  }
+
+  export type MathProblemAvgOrderByAggregateInput = {
+    id?: SortOrder
+    answer?: SortOrder
+    level?: SortOrder
+    gameId?: SortOrder
+  }
+
+  export type MathProblemMaxOrderByAggregateInput = {
+    id?: SortOrder
+    problem?: SortOrder
+    answer?: SortOrder
+    level?: SortOrder
+    gameId?: SortOrder
+  }
+
+  export type MathProblemMinOrderByAggregateInput = {
+    id?: SortOrder
+    problem?: SortOrder
+    answer?: SortOrder
+    level?: SortOrder
+    gameId?: SortOrder
+  }
+
+  export type MathProblemSumOrderByAggregateInput = {
+    id?: SortOrder
+    answer?: SortOrder
+    level?: SortOrder
+    gameId?: SortOrder
+  }
+  export type JsonWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedJsonFilter<$PrismaModel>
+    _max?: NestedJsonFilter<$PrismaModel>
+  }
+
+  export type WordListRelationFilter = {
+    every?: WordWhereInput
+    some?: WordWhereInput
+    none?: WordWhereInput
   }
 
   export type UserProgressListRelationFilter = {
@@ -6165,11 +7883,31 @@ export namespace Prisma {
     none?: UserProgressWhereInput
   }
 
-  export type ScoreOrderByRelationAggregateInput = {
+  export type MathProblemListRelationFilter = {
+    every?: MathProblemWhereInput
+    some?: MathProblemWhereInput
+    none?: MathProblemWhereInput
+  }
+
+  export type ScoreListRelationFilter = {
+    every?: ScoreWhereInput
+    some?: ScoreWhereInput
+    none?: ScoreWhereInput
+  }
+
+  export type WordOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
   export type UserProgressOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type MathProblemOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type ScoreOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -6194,11 +7932,6 @@ export namespace Prisma {
 
   export type GameSumOrderByAggregateInput = {
     id?: SortOrder
-  }
-
-  export type GameScalarRelationFilter = {
-    is?: GameWhereInput
-    isNot?: GameWhereInput
   }
 
   export type UserProgressUserIdGameIdCompoundUniqueInput = {
@@ -6309,6 +8042,12 @@ export namespace Prisma {
     set: string[]
   }
 
+  export type GameCreateNestedOneWithoutWordsInput = {
+    create?: XOR<GameCreateWithoutWordsInput, GameUncheckedCreateWithoutWordsInput>
+    connectOrCreate?: GameCreateOrConnectWithoutWordsInput
+    connect?: GameWhereUniqueInput
+  }
+
   export type StringFieldUpdateOperationsInput = {
     set?: string
   }
@@ -6326,11 +8065,43 @@ export namespace Prisma {
     divide?: number
   }
 
-  export type ScoreCreateNestedManyWithoutGameInput = {
-    create?: XOR<ScoreCreateWithoutGameInput, ScoreUncheckedCreateWithoutGameInput> | ScoreCreateWithoutGameInput[] | ScoreUncheckedCreateWithoutGameInput[]
-    connectOrCreate?: ScoreCreateOrConnectWithoutGameInput | ScoreCreateOrConnectWithoutGameInput[]
-    createMany?: ScoreCreateManyGameInputEnvelope
-    connect?: ScoreWhereUniqueInput | ScoreWhereUniqueInput[]
+  export type GameUpdateOneWithoutWordsNestedInput = {
+    create?: XOR<GameCreateWithoutWordsInput, GameUncheckedCreateWithoutWordsInput>
+    connectOrCreate?: GameCreateOrConnectWithoutWordsInput
+    upsert?: GameUpsertWithoutWordsInput
+    disconnect?: GameWhereInput | boolean
+    delete?: GameWhereInput | boolean
+    connect?: GameWhereUniqueInput
+    update?: XOR<XOR<GameUpdateToOneWithWhereWithoutWordsInput, GameUpdateWithoutWordsInput>, GameUncheckedUpdateWithoutWordsInput>
+  }
+
+  export type NullableIntFieldUpdateOperationsInput = {
+    set?: number | null
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
+  export type GameCreateNestedOneWithoutMathProblemsInput = {
+    create?: XOR<GameCreateWithoutMathProblemsInput, GameUncheckedCreateWithoutMathProblemsInput>
+    connectOrCreate?: GameCreateOrConnectWithoutMathProblemsInput
+    connect?: GameWhereUniqueInput
+  }
+
+  export type GameUpdateOneRequiredWithoutMathProblemsNestedInput = {
+    create?: XOR<GameCreateWithoutMathProblemsInput, GameUncheckedCreateWithoutMathProblemsInput>
+    connectOrCreate?: GameCreateOrConnectWithoutMathProblemsInput
+    upsert?: GameUpsertWithoutMathProblemsInput
+    connect?: GameWhereUniqueInput
+    update?: XOR<XOR<GameUpdateToOneWithWhereWithoutMathProblemsInput, GameUpdateWithoutMathProblemsInput>, GameUncheckedUpdateWithoutMathProblemsInput>
+  }
+
+  export type WordCreateNestedManyWithoutGameInput = {
+    create?: XOR<WordCreateWithoutGameInput, WordUncheckedCreateWithoutGameInput> | WordCreateWithoutGameInput[] | WordUncheckedCreateWithoutGameInput[]
+    connectOrCreate?: WordCreateOrConnectWithoutGameInput | WordCreateOrConnectWithoutGameInput[]
+    createMany?: WordCreateManyGameInputEnvelope
+    connect?: WordWhereUniqueInput | WordWhereUniqueInput[]
   }
 
   export type UserProgressCreateNestedManyWithoutGameInput = {
@@ -6340,11 +8111,25 @@ export namespace Prisma {
     connect?: UserProgressWhereUniqueInput | UserProgressWhereUniqueInput[]
   }
 
-  export type ScoreUncheckedCreateNestedManyWithoutGameInput = {
+  export type MathProblemCreateNestedManyWithoutGameInput = {
+    create?: XOR<MathProblemCreateWithoutGameInput, MathProblemUncheckedCreateWithoutGameInput> | MathProblemCreateWithoutGameInput[] | MathProblemUncheckedCreateWithoutGameInput[]
+    connectOrCreate?: MathProblemCreateOrConnectWithoutGameInput | MathProblemCreateOrConnectWithoutGameInput[]
+    createMany?: MathProblemCreateManyGameInputEnvelope
+    connect?: MathProblemWhereUniqueInput | MathProblemWhereUniqueInput[]
+  }
+
+  export type ScoreCreateNestedManyWithoutGameInput = {
     create?: XOR<ScoreCreateWithoutGameInput, ScoreUncheckedCreateWithoutGameInput> | ScoreCreateWithoutGameInput[] | ScoreUncheckedCreateWithoutGameInput[]
     connectOrCreate?: ScoreCreateOrConnectWithoutGameInput | ScoreCreateOrConnectWithoutGameInput[]
     createMany?: ScoreCreateManyGameInputEnvelope
     connect?: ScoreWhereUniqueInput | ScoreWhereUniqueInput[]
+  }
+
+  export type WordUncheckedCreateNestedManyWithoutGameInput = {
+    create?: XOR<WordCreateWithoutGameInput, WordUncheckedCreateWithoutGameInput> | WordCreateWithoutGameInput[] | WordUncheckedCreateWithoutGameInput[]
+    connectOrCreate?: WordCreateOrConnectWithoutGameInput | WordCreateOrConnectWithoutGameInput[]
+    createMany?: WordCreateManyGameInputEnvelope
+    connect?: WordWhereUniqueInput | WordWhereUniqueInput[]
   }
 
   export type UserProgressUncheckedCreateNestedManyWithoutGameInput = {
@@ -6354,18 +8139,32 @@ export namespace Prisma {
     connect?: UserProgressWhereUniqueInput | UserProgressWhereUniqueInput[]
   }
 
-  export type ScoreUpdateManyWithoutGameNestedInput = {
+  export type MathProblemUncheckedCreateNestedManyWithoutGameInput = {
+    create?: XOR<MathProblemCreateWithoutGameInput, MathProblemUncheckedCreateWithoutGameInput> | MathProblemCreateWithoutGameInput[] | MathProblemUncheckedCreateWithoutGameInput[]
+    connectOrCreate?: MathProblemCreateOrConnectWithoutGameInput | MathProblemCreateOrConnectWithoutGameInput[]
+    createMany?: MathProblemCreateManyGameInputEnvelope
+    connect?: MathProblemWhereUniqueInput | MathProblemWhereUniqueInput[]
+  }
+
+  export type ScoreUncheckedCreateNestedManyWithoutGameInput = {
     create?: XOR<ScoreCreateWithoutGameInput, ScoreUncheckedCreateWithoutGameInput> | ScoreCreateWithoutGameInput[] | ScoreUncheckedCreateWithoutGameInput[]
     connectOrCreate?: ScoreCreateOrConnectWithoutGameInput | ScoreCreateOrConnectWithoutGameInput[]
-    upsert?: ScoreUpsertWithWhereUniqueWithoutGameInput | ScoreUpsertWithWhereUniqueWithoutGameInput[]
     createMany?: ScoreCreateManyGameInputEnvelope
-    set?: ScoreWhereUniqueInput | ScoreWhereUniqueInput[]
-    disconnect?: ScoreWhereUniqueInput | ScoreWhereUniqueInput[]
-    delete?: ScoreWhereUniqueInput | ScoreWhereUniqueInput[]
     connect?: ScoreWhereUniqueInput | ScoreWhereUniqueInput[]
-    update?: ScoreUpdateWithWhereUniqueWithoutGameInput | ScoreUpdateWithWhereUniqueWithoutGameInput[]
-    updateMany?: ScoreUpdateManyWithWhereWithoutGameInput | ScoreUpdateManyWithWhereWithoutGameInput[]
-    deleteMany?: ScoreScalarWhereInput | ScoreScalarWhereInput[]
+  }
+
+  export type WordUpdateManyWithoutGameNestedInput = {
+    create?: XOR<WordCreateWithoutGameInput, WordUncheckedCreateWithoutGameInput> | WordCreateWithoutGameInput[] | WordUncheckedCreateWithoutGameInput[]
+    connectOrCreate?: WordCreateOrConnectWithoutGameInput | WordCreateOrConnectWithoutGameInput[]
+    upsert?: WordUpsertWithWhereUniqueWithoutGameInput | WordUpsertWithWhereUniqueWithoutGameInput[]
+    createMany?: WordCreateManyGameInputEnvelope
+    set?: WordWhereUniqueInput | WordWhereUniqueInput[]
+    disconnect?: WordWhereUniqueInput | WordWhereUniqueInput[]
+    delete?: WordWhereUniqueInput | WordWhereUniqueInput[]
+    connect?: WordWhereUniqueInput | WordWhereUniqueInput[]
+    update?: WordUpdateWithWhereUniqueWithoutGameInput | WordUpdateWithWhereUniqueWithoutGameInput[]
+    updateMany?: WordUpdateManyWithWhereWithoutGameInput | WordUpdateManyWithWhereWithoutGameInput[]
+    deleteMany?: WordScalarWhereInput | WordScalarWhereInput[]
   }
 
   export type UserProgressUpdateManyWithoutGameNestedInput = {
@@ -6382,7 +8181,21 @@ export namespace Prisma {
     deleteMany?: UserProgressScalarWhereInput | UserProgressScalarWhereInput[]
   }
 
-  export type ScoreUncheckedUpdateManyWithoutGameNestedInput = {
+  export type MathProblemUpdateManyWithoutGameNestedInput = {
+    create?: XOR<MathProblemCreateWithoutGameInput, MathProblemUncheckedCreateWithoutGameInput> | MathProblemCreateWithoutGameInput[] | MathProblemUncheckedCreateWithoutGameInput[]
+    connectOrCreate?: MathProblemCreateOrConnectWithoutGameInput | MathProblemCreateOrConnectWithoutGameInput[]
+    upsert?: MathProblemUpsertWithWhereUniqueWithoutGameInput | MathProblemUpsertWithWhereUniqueWithoutGameInput[]
+    createMany?: MathProblemCreateManyGameInputEnvelope
+    set?: MathProblemWhereUniqueInput | MathProblemWhereUniqueInput[]
+    disconnect?: MathProblemWhereUniqueInput | MathProblemWhereUniqueInput[]
+    delete?: MathProblemWhereUniqueInput | MathProblemWhereUniqueInput[]
+    connect?: MathProblemWhereUniqueInput | MathProblemWhereUniqueInput[]
+    update?: MathProblemUpdateWithWhereUniqueWithoutGameInput | MathProblemUpdateWithWhereUniqueWithoutGameInput[]
+    updateMany?: MathProblemUpdateManyWithWhereWithoutGameInput | MathProblemUpdateManyWithWhereWithoutGameInput[]
+    deleteMany?: MathProblemScalarWhereInput | MathProblemScalarWhereInput[]
+  }
+
+  export type ScoreUpdateManyWithoutGameNestedInput = {
     create?: XOR<ScoreCreateWithoutGameInput, ScoreUncheckedCreateWithoutGameInput> | ScoreCreateWithoutGameInput[] | ScoreUncheckedCreateWithoutGameInput[]
     connectOrCreate?: ScoreCreateOrConnectWithoutGameInput | ScoreCreateOrConnectWithoutGameInput[]
     upsert?: ScoreUpsertWithWhereUniqueWithoutGameInput | ScoreUpsertWithWhereUniqueWithoutGameInput[]
@@ -6394,6 +8207,20 @@ export namespace Prisma {
     update?: ScoreUpdateWithWhereUniqueWithoutGameInput | ScoreUpdateWithWhereUniqueWithoutGameInput[]
     updateMany?: ScoreUpdateManyWithWhereWithoutGameInput | ScoreUpdateManyWithWhereWithoutGameInput[]
     deleteMany?: ScoreScalarWhereInput | ScoreScalarWhereInput[]
+  }
+
+  export type WordUncheckedUpdateManyWithoutGameNestedInput = {
+    create?: XOR<WordCreateWithoutGameInput, WordUncheckedCreateWithoutGameInput> | WordCreateWithoutGameInput[] | WordUncheckedCreateWithoutGameInput[]
+    connectOrCreate?: WordCreateOrConnectWithoutGameInput | WordCreateOrConnectWithoutGameInput[]
+    upsert?: WordUpsertWithWhereUniqueWithoutGameInput | WordUpsertWithWhereUniqueWithoutGameInput[]
+    createMany?: WordCreateManyGameInputEnvelope
+    set?: WordWhereUniqueInput | WordWhereUniqueInput[]
+    disconnect?: WordWhereUniqueInput | WordWhereUniqueInput[]
+    delete?: WordWhereUniqueInput | WordWhereUniqueInput[]
+    connect?: WordWhereUniqueInput | WordWhereUniqueInput[]
+    update?: WordUpdateWithWhereUniqueWithoutGameInput | WordUpdateWithWhereUniqueWithoutGameInput[]
+    updateMany?: WordUpdateManyWithWhereWithoutGameInput | WordUpdateManyWithWhereWithoutGameInput[]
+    deleteMany?: WordScalarWhereInput | WordScalarWhereInput[]
   }
 
   export type UserProgressUncheckedUpdateManyWithoutGameNestedInput = {
@@ -6408,6 +8235,34 @@ export namespace Prisma {
     update?: UserProgressUpdateWithWhereUniqueWithoutGameInput | UserProgressUpdateWithWhereUniqueWithoutGameInput[]
     updateMany?: UserProgressUpdateManyWithWhereWithoutGameInput | UserProgressUpdateManyWithWhereWithoutGameInput[]
     deleteMany?: UserProgressScalarWhereInput | UserProgressScalarWhereInput[]
+  }
+
+  export type MathProblemUncheckedUpdateManyWithoutGameNestedInput = {
+    create?: XOR<MathProblemCreateWithoutGameInput, MathProblemUncheckedCreateWithoutGameInput> | MathProblemCreateWithoutGameInput[] | MathProblemUncheckedCreateWithoutGameInput[]
+    connectOrCreate?: MathProblemCreateOrConnectWithoutGameInput | MathProblemCreateOrConnectWithoutGameInput[]
+    upsert?: MathProblemUpsertWithWhereUniqueWithoutGameInput | MathProblemUpsertWithWhereUniqueWithoutGameInput[]
+    createMany?: MathProblemCreateManyGameInputEnvelope
+    set?: MathProblemWhereUniqueInput | MathProblemWhereUniqueInput[]
+    disconnect?: MathProblemWhereUniqueInput | MathProblemWhereUniqueInput[]
+    delete?: MathProblemWhereUniqueInput | MathProblemWhereUniqueInput[]
+    connect?: MathProblemWhereUniqueInput | MathProblemWhereUniqueInput[]
+    update?: MathProblemUpdateWithWhereUniqueWithoutGameInput | MathProblemUpdateWithWhereUniqueWithoutGameInput[]
+    updateMany?: MathProblemUpdateManyWithWhereWithoutGameInput | MathProblemUpdateManyWithWhereWithoutGameInput[]
+    deleteMany?: MathProblemScalarWhereInput | MathProblemScalarWhereInput[]
+  }
+
+  export type ScoreUncheckedUpdateManyWithoutGameNestedInput = {
+    create?: XOR<ScoreCreateWithoutGameInput, ScoreUncheckedCreateWithoutGameInput> | ScoreCreateWithoutGameInput[] | ScoreUncheckedCreateWithoutGameInput[]
+    connectOrCreate?: ScoreCreateOrConnectWithoutGameInput | ScoreCreateOrConnectWithoutGameInput[]
+    upsert?: ScoreUpsertWithWhereUniqueWithoutGameInput | ScoreUpsertWithWhereUniqueWithoutGameInput[]
+    createMany?: ScoreCreateManyGameInputEnvelope
+    set?: ScoreWhereUniqueInput | ScoreWhereUniqueInput[]
+    disconnect?: ScoreWhereUniqueInput | ScoreWhereUniqueInput[]
+    delete?: ScoreWhereUniqueInput | ScoreWhereUniqueInput[]
+    connect?: ScoreWhereUniqueInput | ScoreWhereUniqueInput[]
+    update?: ScoreUpdateWithWhereUniqueWithoutGameInput | ScoreUpdateWithWhereUniqueWithoutGameInput[]
+    updateMany?: ScoreUpdateManyWithWhereWithoutGameInput | ScoreUpdateManyWithWhereWithoutGameInput[]
+    deleteMany?: ScoreScalarWhereInput | ScoreScalarWhereInput[]
   }
 
   export type GameCreateNestedOneWithoutUserProgressInput = {
@@ -6467,6 +8322,17 @@ export namespace Prisma {
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
+  export type NestedIntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -6511,6 +8377,56 @@ export namespace Prisma {
     _max?: NestedStringFilter<$PrismaModel>
   }
 
+  export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
+  export type NestedFloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
+  export type NestedJsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
   export type NestedDateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
@@ -6534,6 +8450,169 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedDateTimeFilter<$PrismaModel>
     _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type GameCreateWithoutWordsInput = {
+    name: string
+    userProgress?: UserProgressCreateNestedManyWithoutGameInput
+    mathProblems?: MathProblemCreateNestedManyWithoutGameInput
+    scores?: ScoreCreateNestedManyWithoutGameInput
+  }
+
+  export type GameUncheckedCreateWithoutWordsInput = {
+    id?: number
+    name: string
+    userProgress?: UserProgressUncheckedCreateNestedManyWithoutGameInput
+    mathProblems?: MathProblemUncheckedCreateNestedManyWithoutGameInput
+    scores?: ScoreUncheckedCreateNestedManyWithoutGameInput
+  }
+
+  export type GameCreateOrConnectWithoutWordsInput = {
+    where: GameWhereUniqueInput
+    create: XOR<GameCreateWithoutWordsInput, GameUncheckedCreateWithoutWordsInput>
+  }
+
+  export type GameUpsertWithoutWordsInput = {
+    update: XOR<GameUpdateWithoutWordsInput, GameUncheckedUpdateWithoutWordsInput>
+    create: XOR<GameCreateWithoutWordsInput, GameUncheckedCreateWithoutWordsInput>
+    where?: GameWhereInput
+  }
+
+  export type GameUpdateToOneWithWhereWithoutWordsInput = {
+    where?: GameWhereInput
+    data: XOR<GameUpdateWithoutWordsInput, GameUncheckedUpdateWithoutWordsInput>
+  }
+
+  export type GameUpdateWithoutWordsInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    userProgress?: UserProgressUpdateManyWithoutGameNestedInput
+    mathProblems?: MathProblemUpdateManyWithoutGameNestedInput
+    scores?: ScoreUpdateManyWithoutGameNestedInput
+  }
+
+  export type GameUncheckedUpdateWithoutWordsInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    userProgress?: UserProgressUncheckedUpdateManyWithoutGameNestedInput
+    mathProblems?: MathProblemUncheckedUpdateManyWithoutGameNestedInput
+    scores?: ScoreUncheckedUpdateManyWithoutGameNestedInput
+  }
+
+  export type GameCreateWithoutMathProblemsInput = {
+    name: string
+    words?: WordCreateNestedManyWithoutGameInput
+    userProgress?: UserProgressCreateNestedManyWithoutGameInput
+    scores?: ScoreCreateNestedManyWithoutGameInput
+  }
+
+  export type GameUncheckedCreateWithoutMathProblemsInput = {
+    id?: number
+    name: string
+    words?: WordUncheckedCreateNestedManyWithoutGameInput
+    userProgress?: UserProgressUncheckedCreateNestedManyWithoutGameInput
+    scores?: ScoreUncheckedCreateNestedManyWithoutGameInput
+  }
+
+  export type GameCreateOrConnectWithoutMathProblemsInput = {
+    where: GameWhereUniqueInput
+    create: XOR<GameCreateWithoutMathProblemsInput, GameUncheckedCreateWithoutMathProblemsInput>
+  }
+
+  export type GameUpsertWithoutMathProblemsInput = {
+    update: XOR<GameUpdateWithoutMathProblemsInput, GameUncheckedUpdateWithoutMathProblemsInput>
+    create: XOR<GameCreateWithoutMathProblemsInput, GameUncheckedCreateWithoutMathProblemsInput>
+    where?: GameWhereInput
+  }
+
+  export type GameUpdateToOneWithWhereWithoutMathProblemsInput = {
+    where?: GameWhereInput
+    data: XOR<GameUpdateWithoutMathProblemsInput, GameUncheckedUpdateWithoutMathProblemsInput>
+  }
+
+  export type GameUpdateWithoutMathProblemsInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    words?: WordUpdateManyWithoutGameNestedInput
+    userProgress?: UserProgressUpdateManyWithoutGameNestedInput
+    scores?: ScoreUpdateManyWithoutGameNestedInput
+  }
+
+  export type GameUncheckedUpdateWithoutMathProblemsInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    words?: WordUncheckedUpdateManyWithoutGameNestedInput
+    userProgress?: UserProgressUncheckedUpdateManyWithoutGameNestedInput
+    scores?: ScoreUncheckedUpdateManyWithoutGameNestedInput
+  }
+
+  export type WordCreateWithoutGameInput = {
+    answer: string
+    image: string
+    options?: WordCreateoptionsInput | string[]
+    level: number
+  }
+
+  export type WordUncheckedCreateWithoutGameInput = {
+    id?: number
+    answer: string
+    image: string
+    options?: WordCreateoptionsInput | string[]
+    level: number
+  }
+
+  export type WordCreateOrConnectWithoutGameInput = {
+    where: WordWhereUniqueInput
+    create: XOR<WordCreateWithoutGameInput, WordUncheckedCreateWithoutGameInput>
+  }
+
+  export type WordCreateManyGameInputEnvelope = {
+    data: WordCreateManyGameInput | WordCreateManyGameInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type UserProgressCreateWithoutGameInput = {
+    userId: string
+    levelsPassed?: number
+  }
+
+  export type UserProgressUncheckedCreateWithoutGameInput = {
+    id?: number
+    userId: string
+    levelsPassed?: number
+  }
+
+  export type UserProgressCreateOrConnectWithoutGameInput = {
+    where: UserProgressWhereUniqueInput
+    create: XOR<UserProgressCreateWithoutGameInput, UserProgressUncheckedCreateWithoutGameInput>
+  }
+
+  export type UserProgressCreateManyGameInputEnvelope = {
+    data: UserProgressCreateManyGameInput | UserProgressCreateManyGameInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type MathProblemCreateWithoutGameInput = {
+    problem: string
+    answer: number
+    options: JsonNullValueInput | InputJsonValue
+    level: number
+  }
+
+  export type MathProblemUncheckedCreateWithoutGameInput = {
+    id?: number
+    problem: string
+    answer: number
+    options: JsonNullValueInput | InputJsonValue
+    level: number
+  }
+
+  export type MathProblemCreateOrConnectWithoutGameInput = {
+    where: MathProblemWhereUniqueInput
+    create: XOR<MathProblemCreateWithoutGameInput, MathProblemUncheckedCreateWithoutGameInput>
+  }
+
+  export type MathProblemCreateManyGameInputEnvelope = {
+    data: MathProblemCreateManyGameInput | MathProblemCreateManyGameInput[]
+    skipDuplicates?: boolean
   }
 
   export type ScoreCreateWithoutGameInput = {
@@ -6561,25 +8640,86 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-  export type UserProgressCreateWithoutGameInput = {
-    userId: string
-    levelsPassed?: number
+  export type WordUpsertWithWhereUniqueWithoutGameInput = {
+    where: WordWhereUniqueInput
+    update: XOR<WordUpdateWithoutGameInput, WordUncheckedUpdateWithoutGameInput>
+    create: XOR<WordCreateWithoutGameInput, WordUncheckedCreateWithoutGameInput>
   }
 
-  export type UserProgressUncheckedCreateWithoutGameInput = {
-    id?: number
-    userId: string
-    levelsPassed?: number
+  export type WordUpdateWithWhereUniqueWithoutGameInput = {
+    where: WordWhereUniqueInput
+    data: XOR<WordUpdateWithoutGameInput, WordUncheckedUpdateWithoutGameInput>
   }
 
-  export type UserProgressCreateOrConnectWithoutGameInput = {
+  export type WordUpdateManyWithWhereWithoutGameInput = {
+    where: WordScalarWhereInput
+    data: XOR<WordUpdateManyMutationInput, WordUncheckedUpdateManyWithoutGameInput>
+  }
+
+  export type WordScalarWhereInput = {
+    AND?: WordScalarWhereInput | WordScalarWhereInput[]
+    OR?: WordScalarWhereInput[]
+    NOT?: WordScalarWhereInput | WordScalarWhereInput[]
+    id?: IntFilter<"Word"> | number
+    answer?: StringFilter<"Word"> | string
+    image?: StringFilter<"Word"> | string
+    options?: StringNullableListFilter<"Word">
+    level?: IntFilter<"Word"> | number
+    gameId?: IntNullableFilter<"Word"> | number | null
+  }
+
+  export type UserProgressUpsertWithWhereUniqueWithoutGameInput = {
     where: UserProgressWhereUniqueInput
+    update: XOR<UserProgressUpdateWithoutGameInput, UserProgressUncheckedUpdateWithoutGameInput>
     create: XOR<UserProgressCreateWithoutGameInput, UserProgressUncheckedCreateWithoutGameInput>
   }
 
-  export type UserProgressCreateManyGameInputEnvelope = {
-    data: UserProgressCreateManyGameInput | UserProgressCreateManyGameInput[]
-    skipDuplicates?: boolean
+  export type UserProgressUpdateWithWhereUniqueWithoutGameInput = {
+    where: UserProgressWhereUniqueInput
+    data: XOR<UserProgressUpdateWithoutGameInput, UserProgressUncheckedUpdateWithoutGameInput>
+  }
+
+  export type UserProgressUpdateManyWithWhereWithoutGameInput = {
+    where: UserProgressScalarWhereInput
+    data: XOR<UserProgressUpdateManyMutationInput, UserProgressUncheckedUpdateManyWithoutGameInput>
+  }
+
+  export type UserProgressScalarWhereInput = {
+    AND?: UserProgressScalarWhereInput | UserProgressScalarWhereInput[]
+    OR?: UserProgressScalarWhereInput[]
+    NOT?: UserProgressScalarWhereInput | UserProgressScalarWhereInput[]
+    id?: IntFilter<"UserProgress"> | number
+    userId?: StringFilter<"UserProgress"> | string
+    gameId?: IntFilter<"UserProgress"> | number
+    levelsPassed?: IntFilter<"UserProgress"> | number
+  }
+
+  export type MathProblemUpsertWithWhereUniqueWithoutGameInput = {
+    where: MathProblemWhereUniqueInput
+    update: XOR<MathProblemUpdateWithoutGameInput, MathProblemUncheckedUpdateWithoutGameInput>
+    create: XOR<MathProblemCreateWithoutGameInput, MathProblemUncheckedCreateWithoutGameInput>
+  }
+
+  export type MathProblemUpdateWithWhereUniqueWithoutGameInput = {
+    where: MathProblemWhereUniqueInput
+    data: XOR<MathProblemUpdateWithoutGameInput, MathProblemUncheckedUpdateWithoutGameInput>
+  }
+
+  export type MathProblemUpdateManyWithWhereWithoutGameInput = {
+    where: MathProblemScalarWhereInput
+    data: XOR<MathProblemUpdateManyMutationInput, MathProblemUncheckedUpdateManyWithoutGameInput>
+  }
+
+  export type MathProblemScalarWhereInput = {
+    AND?: MathProblemScalarWhereInput | MathProblemScalarWhereInput[]
+    OR?: MathProblemScalarWhereInput[]
+    NOT?: MathProblemScalarWhereInput | MathProblemScalarWhereInput[]
+    id?: IntFilter<"MathProblem"> | number
+    problem?: StringFilter<"MathProblem"> | string
+    answer?: IntFilter<"MathProblem"> | number
+    options?: JsonFilter<"MathProblem">
+    level?: IntFilter<"MathProblem"> | number
+    gameId?: IntFilter<"MathProblem"> | number
   }
 
   export type ScoreUpsertWithWhereUniqueWithoutGameInput = {
@@ -6610,40 +8750,18 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Score"> | Date | string
   }
 
-  export type UserProgressUpsertWithWhereUniqueWithoutGameInput = {
-    where: UserProgressWhereUniqueInput
-    update: XOR<UserProgressUpdateWithoutGameInput, UserProgressUncheckedUpdateWithoutGameInput>
-    create: XOR<UserProgressCreateWithoutGameInput, UserProgressUncheckedCreateWithoutGameInput>
-  }
-
-  export type UserProgressUpdateWithWhereUniqueWithoutGameInput = {
-    where: UserProgressWhereUniqueInput
-    data: XOR<UserProgressUpdateWithoutGameInput, UserProgressUncheckedUpdateWithoutGameInput>
-  }
-
-  export type UserProgressUpdateManyWithWhereWithoutGameInput = {
-    where: UserProgressScalarWhereInput
-    data: XOR<UserProgressUpdateManyMutationInput, UserProgressUncheckedUpdateManyWithoutGameInput>
-  }
-
-  export type UserProgressScalarWhereInput = {
-    AND?: UserProgressScalarWhereInput | UserProgressScalarWhereInput[]
-    OR?: UserProgressScalarWhereInput[]
-    NOT?: UserProgressScalarWhereInput | UserProgressScalarWhereInput[]
-    id?: IntFilter<"UserProgress"> | number
-    userId?: StringFilter<"UserProgress"> | string
-    gameId?: IntFilter<"UserProgress"> | number
-    levelsPassed?: IntFilter<"UserProgress"> | number
-  }
-
   export type GameCreateWithoutUserProgressInput = {
     name: string
+    words?: WordCreateNestedManyWithoutGameInput
+    mathProblems?: MathProblemCreateNestedManyWithoutGameInput
     scores?: ScoreCreateNestedManyWithoutGameInput
   }
 
   export type GameUncheckedCreateWithoutUserProgressInput = {
     id?: number
     name: string
+    words?: WordUncheckedCreateNestedManyWithoutGameInput
+    mathProblems?: MathProblemUncheckedCreateNestedManyWithoutGameInput
     scores?: ScoreUncheckedCreateNestedManyWithoutGameInput
   }
 
@@ -6665,24 +8783,32 @@ export namespace Prisma {
 
   export type GameUpdateWithoutUserProgressInput = {
     name?: StringFieldUpdateOperationsInput | string
+    words?: WordUpdateManyWithoutGameNestedInput
+    mathProblems?: MathProblemUpdateManyWithoutGameNestedInput
     scores?: ScoreUpdateManyWithoutGameNestedInput
   }
 
   export type GameUncheckedUpdateWithoutUserProgressInput = {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
+    words?: WordUncheckedUpdateManyWithoutGameNestedInput
+    mathProblems?: MathProblemUncheckedUpdateManyWithoutGameNestedInput
     scores?: ScoreUncheckedUpdateManyWithoutGameNestedInput
   }
 
   export type GameCreateWithoutScoresInput = {
     name: string
+    words?: WordCreateNestedManyWithoutGameInput
     userProgress?: UserProgressCreateNestedManyWithoutGameInput
+    mathProblems?: MathProblemCreateNestedManyWithoutGameInput
   }
 
   export type GameUncheckedCreateWithoutScoresInput = {
     id?: number
     name: string
+    words?: WordUncheckedCreateNestedManyWithoutGameInput
     userProgress?: UserProgressUncheckedCreateNestedManyWithoutGameInput
+    mathProblems?: MathProblemUncheckedCreateNestedManyWithoutGameInput
   }
 
   export type GameCreateOrConnectWithoutScoresInput = {
@@ -6703,13 +8829,39 @@ export namespace Prisma {
 
   export type GameUpdateWithoutScoresInput = {
     name?: StringFieldUpdateOperationsInput | string
+    words?: WordUpdateManyWithoutGameNestedInput
     userProgress?: UserProgressUpdateManyWithoutGameNestedInput
+    mathProblems?: MathProblemUpdateManyWithoutGameNestedInput
   }
 
   export type GameUncheckedUpdateWithoutScoresInput = {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
+    words?: WordUncheckedUpdateManyWithoutGameNestedInput
     userProgress?: UserProgressUncheckedUpdateManyWithoutGameNestedInput
+    mathProblems?: MathProblemUncheckedUpdateManyWithoutGameNestedInput
+  }
+
+  export type WordCreateManyGameInput = {
+    id?: number
+    answer: string
+    image: string
+    options?: WordCreateoptionsInput | string[]
+    level: number
+  }
+
+  export type UserProgressCreateManyGameInput = {
+    id?: number
+    userId: string
+    levelsPassed?: number
+  }
+
+  export type MathProblemCreateManyGameInput = {
+    id?: number
+    problem: string
+    answer: number
+    options: JsonNullValueInput | InputJsonValue
+    level: number
   }
 
   export type ScoreCreateManyGameInput = {
@@ -6720,10 +8872,67 @@ export namespace Prisma {
     createdAt?: Date | string
   }
 
-  export type UserProgressCreateManyGameInput = {
-    id?: number
-    userId: string
-    levelsPassed?: number
+  export type WordUpdateWithoutGameInput = {
+    answer?: StringFieldUpdateOperationsInput | string
+    image?: StringFieldUpdateOperationsInput | string
+    options?: WordUpdateoptionsInput | string[]
+    level?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type WordUncheckedUpdateWithoutGameInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    answer?: StringFieldUpdateOperationsInput | string
+    image?: StringFieldUpdateOperationsInput | string
+    options?: WordUpdateoptionsInput | string[]
+    level?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type WordUncheckedUpdateManyWithoutGameInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    answer?: StringFieldUpdateOperationsInput | string
+    image?: StringFieldUpdateOperationsInput | string
+    options?: WordUpdateoptionsInput | string[]
+    level?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type UserProgressUpdateWithoutGameInput = {
+    userId?: StringFieldUpdateOperationsInput | string
+    levelsPassed?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type UserProgressUncheckedUpdateWithoutGameInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    userId?: StringFieldUpdateOperationsInput | string
+    levelsPassed?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type UserProgressUncheckedUpdateManyWithoutGameInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    userId?: StringFieldUpdateOperationsInput | string
+    levelsPassed?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type MathProblemUpdateWithoutGameInput = {
+    problem?: StringFieldUpdateOperationsInput | string
+    answer?: IntFieldUpdateOperationsInput | number
+    options?: JsonNullValueInput | InputJsonValue
+    level?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type MathProblemUncheckedUpdateWithoutGameInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    problem?: StringFieldUpdateOperationsInput | string
+    answer?: IntFieldUpdateOperationsInput | number
+    options?: JsonNullValueInput | InputJsonValue
+    level?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type MathProblemUncheckedUpdateManyWithoutGameInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    problem?: StringFieldUpdateOperationsInput | string
+    answer?: IntFieldUpdateOperationsInput | number
+    options?: JsonNullValueInput | InputJsonValue
+    level?: IntFieldUpdateOperationsInput | number
   }
 
   export type ScoreUpdateWithoutGameInput = {
@@ -6747,23 +8956,6 @@ export namespace Prisma {
     level?: IntFieldUpdateOperationsInput | number
     score?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type UserProgressUpdateWithoutGameInput = {
-    userId?: StringFieldUpdateOperationsInput | string
-    levelsPassed?: IntFieldUpdateOperationsInput | number
-  }
-
-  export type UserProgressUncheckedUpdateWithoutGameInput = {
-    id?: IntFieldUpdateOperationsInput | number
-    userId?: StringFieldUpdateOperationsInput | string
-    levelsPassed?: IntFieldUpdateOperationsInput | number
-  }
-
-  export type UserProgressUncheckedUpdateManyWithoutGameInput = {
-    id?: IntFieldUpdateOperationsInput | number
-    userId?: StringFieldUpdateOperationsInput | string
-    levelsPassed?: IntFieldUpdateOperationsInput | number
   }
 
 

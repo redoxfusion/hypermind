@@ -25,14 +25,14 @@ export default function EnglishGame() {
 
       try {
         // Fetch user progress
-        const progressRes = await fetch('/api/user-progress');
+        const progressRes = await fetch('/api/user-progress?game=EnglishGame');
         if (!progressRes.ok) throw new Error('Failed to fetch progress');
         const { levelsPassed } = await progressRes.json();
         const initialLevel = levelsPassed + 1; // Start at next level
         setLevel(initialLevel);
 
         // Fetch words for the level
-        const wordsRes = await fetch(`/api/words?level=${initialLevel}`);
+        const wordsRes = await fetch(`/api/words?level=${initialLevel}&game=EnglishGame`);
         if (!wordsRes.ok) throw new Error('Failed to fetch words');
         const data = await wordsRes.json();
         if (data.length === 0) {
@@ -43,7 +43,7 @@ export default function EnglishGame() {
         setLoading(false);
 
         // Fetch total score
-        const scoresRes = await fetch('/api/scores');
+        const scoresRes = await fetch('/api/scores?game=EnglishGame');
         if (scoresRes.ok) {
           const scores = await scoresRes.json();
           const total = scores.reduce((sum, s) => sum + s.score, 0);
@@ -85,7 +85,7 @@ export default function EnglishGame() {
       const scoreRes = await fetch('/api/scores', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ level, score: levelScore }),
+        body: JSON.stringify({ level, score: levelScore, game: 'EnglishGame' }),
       });
       if (!scoreRes.ok) throw new Error('Failed to save score');
     } catch (error) {
@@ -97,7 +97,7 @@ export default function EnglishGame() {
       const progressRes = await fetch('/api/user-progress', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ levelsPassed: level }),
+        body: JSON.stringify({ levelsPassed: level, game: 'EnglishGame' }),
       });
       if (!progressRes.ok) throw new Error('Failed to update progress');
     } catch (error) {
@@ -116,7 +116,7 @@ export default function EnglishGame() {
       setLoading(true);
       // Fetch new words for next level
       try {
-        const wordsRes = await fetch(`/api/words?level=${level + 1}`);
+        const wordsRes = await fetch(`/api/words?level=${level + 1}?game=EnglishGame`);
         if (!wordsRes.ok) throw new Error('Failed to fetch words');
         const data = await wordsRes.json();
         if (data.length === 0) {
@@ -208,22 +208,6 @@ export default function EnglishGame() {
         >
           NEXT
         </button>
-
-        {/* Bottom Nav */}
-        <div className="flex justify-around w-full mt-8 text-white">
-          <Link href="/" className="flex flex-col items-center">
-            <span>🏠</span>
-            <span className="text-xs">Dashboard</span>
-          </Link>
-          <Link href="/score" className="flex flex-col items-center">
-            <span>👑</span>
-            <span className="text-xs">Score</span>
-          </Link>
-          <Link href="/profile" className="flex flex-col items-center">
-            <span>👤</span>
-            <span className="text-xs">Profile</span>
-          </Link>
-        </div>
       </div>
     </div>
   );
