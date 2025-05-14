@@ -1,4 +1,4 @@
-import { Experience } from "../../../components/Experience";
+import { Experience } from "@/app/components/avatar/Experience";
 import { Poppins } from "next/font/google";
 
 const poppins = Poppins({

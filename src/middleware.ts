@@ -6,20 +6,20 @@ const isPublicRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
-  const { userId, sessionId, debug } = await auth();
-  console.log("Middleware triggered for:", req.url);
-  console.log("Auth state - UserID:", userId, "SessionID:", sessionId);
-  // console.log("Debug info:", debug);
+  // const { userId, sessionId, debug } = await auth();
+  // console.log("Middleware triggered for:", req.url);
+  // console.log("Auth state - UserID:", userId, "SessionID:", sessionId);
+  // // console.log("Debug info:", debug);
 
-  if (!isPublicRoute(req)) {
-    console.log("Protected route accessed:", req.url);
-    if (!userId) {
-      console.log("No user authenticated, redirecting to sign-in");
-    }
-    // await auth.protect();
-  } else {
-    console.log("Public route accessed:", req.url);
-  }
+  // if (!isPublicRoute(req)) {
+  //   console.log("Protected route accessed:", req.url);
+  //   if (!userId) {
+  //     console.log("No user authenticated, redirecting to sign-in");
+  //   }
+  //   await auth.protect();
+  // } else {
+  //   console.log("Public route accessed:", req.url);
+  // }
 });
 
 export const config = {
