@@ -1,10 +1,15 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { IoArrowBack, IoBackspaceOutline, IoTrashOutline } from 'react-icons/io5';
-import { useAuth } from '@clerk/nextjs';
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import {
+  IoArrowBack,
+  IoBackspaceOutline,
+  IoTrashOutline,
+} from "react-icons/io5";
+import { useAuth } from "@clerk/nextjs";
+import { ClipLoader } from "react-spinners";
 
 export default function EnglishGame() {
   const { userId } = useAuth();
@@ -12,6 +17,7 @@ export default function EnglishGame() {
   const [current, setCurrent] = useState(0);
   const [selectedLetters, setSelectedLetters] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [nextLoading, setNextLoading] = useState(false);
   const [level, setLevel] = useState(1);
   const [score, setScore] = useState(0);
   const [totalScore, setTotalScore] = useState(0);
@@ -25,25 +31,25 @@ export default function EnglishGame() {
 
       try {
         // Fetch user progress
-        const progressRes = await fetch('/api/user-progress?game=EnglishGame');
-        if (!progressRes.ok) throw new Error('Failed to fetch progress');
+        const progressRes = await fetch("/api/user-progress?game=EnglishGame");
+        if (!progressRes.ok) throw new Error("Failed to fetch progress");
         const { levelsPassed } = await progressRes.json();
         const initialLevel = levelsPassed + 1; // Start at next level
         setLevel(initialLevel);
 
         // Fetch words for the level
-        const wordsRes = await fetch(`/api/words?level=${initialLevel}&game=EnglishGame`);
-        if (!wordsRes.ok) throw new Error('Failed to fetch words');
+        const wordsRes = await fetch(
+          `/api/words?level=${initialLevel}&game=EnglishGame`
+        );
+        if (!wordsRes.ok) throw new Error("Failed to fetch words");
         const data = await wordsRes.json();
         if (data.length === 0) {
-          setLoading(false);
           return;
         }
         setWords(data);
-        setLoading(false);
 
         // Fetch total score
-        const scoresRes = await fetch('/api/scores?game=EnglishGame');
+        const scoresRes = await fetch("/api/scores?game=EnglishGame");
         if (scoresRes.ok) {
           const scores = await scoresRes.json();
           const total = scores.reduce((sum, s) => sum + s.score, 0);
@@ -51,6 +57,7 @@ export default function EnglishGame() {
         }
       } catch (error) {
         console.error(error);
+      } finally {
         setLoading(false);
       }
     }
@@ -75,6 +82,8 @@ export default function EnglishGame() {
   const handleNext = async () => {
     if (!userId) return;
 
+    setNextLoading(true);
+
     // Calculate score (e.g., 10 points per correct answer)
     const levelScore = 10;
     setScore(score + levelScore);
@@ -82,26 +91,30 @@ export default function EnglishGame() {
 
     // Save score
     try {
-      const scoreRes = await fetch('/api/scores', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ level, score: levelScore, game: 'EnglishGame' }),
+      const scoreRes = await fetch("/api/scores", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ level, score: levelScore, game: "EnglishGame" }),
       });
-      if (!scoreRes.ok) throw new Error('Failed to save score');
+      if (!scoreRes.ok) throw new Error("Failed to save score");
     } catch (error) {
-      console.error('Error saving score:', error);
+      console.error("Error saving score:", error);
+    } finally {
+      setNextLoading(false);
     }
 
     // Update progress
     try {
-      const progressRes = await fetch('/api/user-progress', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ levelsPassed: level, game: 'EnglishGame' }),
+      const progressRes = await fetch("/api/user-progress", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ levelsPassed: level, game: "EnglishGame" }),
       });
-      if (!progressRes.ok) throw new Error('Failed to update progress');
+      if (!progressRes.ok) throw new Error("Failed to update progress");
     } catch (error) {
-      console.error('Error updating progress:', error);
+      console.error("Error updating progress:", error);
+    } finally {
+      setNextLoading(false);
     }
 
     // Move to next word or level
@@ -109,6 +122,7 @@ export default function EnglishGame() {
     const nextIndex = current + 1;
     if (nextIndex < words.length) {
       setCurrent(nextIndex);
+      setNextLoading(false);
     } else {
       setLevel((prev) => prev + 1);
       setCurrent(0);
@@ -116,8 +130,10 @@ export default function EnglishGame() {
       setLoading(true);
       // Fetch new words for next level
       try {
-        const wordsRes = await fetch(`/api/words?level=${level + 1}?game=EnglishGame`);
-        if (!wordsRes.ok) throw new Error('Failed to fetch words');
+        const wordsRes = await fetch(
+          `/api/words?level=${level + 1}?game=EnglishGame`
+        );
+        if (!wordsRes.ok) throw new Error("Failed to fetch words");
         const data = await wordsRes.json();
         if (data.length === 0) {
           setLoading(false);
@@ -128,16 +144,39 @@ export default function EnglishGame() {
       } catch (error) {
         console.error(error);
         setLoading(false);
+      } finally {
+        setNextLoading(false);
       }
     }
   };
 
-  if (loading) return <div className="text-center mt-20 text-white">Loading...</div>;
-  if (!userId) return <div className="text-center mt-20 text-white">Please sign in to play.</div>;
-  if (words.length === 0) return <div className="text-center mt-20 text-white">No words available for this level.</div>;
+  if (loading)
+    return (
+      <div className="min-h-screen flex items-center justify-center mt-20 text-white">
+        <ClipLoader
+          loading={loading}
+          size={80}
+          color="#fff"
+          aria-label="Loading Spinner"
+          data-testid="loader"
+        />
+      </div>
+    );
+  if (!userId)
+    return (
+      <div className="min-h-screen text-center mt-20 text-white">
+        Please sign in to play.
+      </div>
+    );
+  if (words.length === 0)
+    return (
+      <div className="min-h-screen text-center mt-20 text-white">
+        No words available for this level.
+      </div>
+    );
 
   const currentWord = words[current];
-  const isComplete = selectedLetters.join('') === currentWord.answer;
+  const isComplete = selectedLetters.join("") === currentWord.answer;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-indigo-400 to-purple-500 flex flex-col items-center justify-between py-8">
@@ -146,7 +185,9 @@ export default function EnglishGame() {
           <IoArrowBack size={30} className="text-white" />
         </Link>
         <h1 className="text-white text-lg">Category: Animals</h1>
-        <div className="text-white text-lg">Level: {level} | Score: {totalScore}</div>
+        <div className="text-white text-lg">
+          Level: {level} | Score: {totalScore}
+        </div>
       </div>
 
       <div className="flex flex-col items-center">
@@ -160,9 +201,12 @@ export default function EnglishGame() {
 
         {/* Selected Letters */}
         <div className="flex gap-4 bg-white rounded-2xl px-8 py-4 mb-2">
-          {currentWord.answer.split('').map((char, index) => (
-            <div key={index} className="text-4xl font-bold underline text-gray-400">
-              {selectedLetters[index] || '_'}
+          {currentWord.answer.split("").map((char, index) => (
+            <div
+              key={index}
+              className="text-4xl font-bold underline text-gray-400"
+            >
+              {selectedLetters[index] || "_"}
             </div>
           ))}
         </div>
@@ -204,9 +248,18 @@ export default function EnglishGame() {
         <button
           onClick={handleNext}
           className="bg-white text-black font-bold rounded-full px-12 py-3 text-lg disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
-          disabled={!isComplete}
+          disabled={!isComplete || nextLoading}
         >
-          NEXT
+          {!nextLoading ? (
+            "NEXT"
+          ) : (
+            <ClipLoader
+              loading={nextLoading}
+              size={20}
+              aria-label="Loading Spinner"
+              data-testid="loader"
+            />
+          )}
         </button>
       </div>
     </div>

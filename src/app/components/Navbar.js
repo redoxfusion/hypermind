@@ -41,13 +41,13 @@ export default function BottomNavBar() {
         <IoTrophy size={24} />
         <span className="text-xs mt-1 font-poppins">Score</span>
       </button>
-      <button
+      {/* <button
         onClick={handleProfileClick}
         className="flex flex-col items-center text-gray-400 cursor-pointer"
       >
         <IoPerson size={24} />
         <span className="text-xs mt-1 font-poppins">Profile</span>
-      </button>
+      </button> */}
       <SignedOut>
         <SignInButton className="text-gray-500 cursor-pointer" />
         <SignUpButton className="text-gray-500 cursor-pointer" />

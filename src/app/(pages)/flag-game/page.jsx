@@ -1,10 +1,15 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { IoArrowBack, IoBackspaceOutline, IoTrashOutline } from 'react-icons/io5';
-import { useAuth } from '@clerk/nextjs';
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import {
+  IoArrowBack,
+  IoBackspaceOutline,
+  IoTrashOutline,
+} from "react-icons/io5";
+import { useAuth } from "@clerk/nextjs";
+import { ClipLoader } from "react-spinners";
 
 export default function FlagsGame() {
   const { userId } = useAuth();
@@ -12,6 +17,7 @@ export default function FlagsGame() {
   const [current, setCurrent] = useState(0);
   const [selectedLetters, setSelectedLetters] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [nextLoading, setNextLoading] = useState(false);
   const [level, setLevel] = useState(1);
   const [score, setScore] = useState(0);
   const [totalScore, setTotalScore] = useState(0);
@@ -25,25 +31,25 @@ export default function FlagsGame() {
 
       try {
         // Fetch user progress
-        const progressRes = await fetch('/api/user-progress?game=FlagsGame');
-        if (!progressRes.ok) throw new Error('Failed to fetch progress');
+        const progressRes = await fetch("/api/user-progress?game=FlagsGame");
+        if (!progressRes.ok) throw new Error("Failed to fetch progress");
         const { levelsPassed } = await progressRes.json();
         const initialLevel = levelsPassed + 1;
         setLevel(initialLevel);
 
         // Fetch words for the level
-        const wordsRes = await fetch(`/api/words?level=${initialLevel}&game=FlagsGame`);
-        if (!wordsRes.ok) throw new Error('Failed to fetch words');
+        const wordsRes = await fetch(
+          `/api/words?level=${initialLevel}&game=FlagsGame`
+        );
+        if (!wordsRes.ok) throw new Error("Failed to fetch words");
         const data = await wordsRes.json();
         if (data.length === 0) {
-          setLoading(false);
           return;
         }
         setWords(data);
-        setLoading(false);
 
         // Fetch total score
-        const scoresRes = await fetch('/api/scores?game=FlagsGame');
+        const scoresRes = await fetch("/api/scores?game=FlagsGame");
         if (scoresRes.ok) {
           const scores = await scoresRes.json();
           const total = scores.reduce((sum, s) => sum + s.score, 0);
@@ -51,6 +57,7 @@ export default function FlagsGame() {
         }
       } catch (error) {
         console.error(error);
+      } finally {
         setLoading(false);
       }
     }
@@ -75,44 +82,53 @@ export default function FlagsGame() {
   const handleNext = async () => {
     if (!userId) return;
 
+    setNextLoading(true);
+
     const levelScore = 10;
     setScore(score + levelScore);
     setTotalScore(totalScore + levelScore);
 
     try {
-      const scoreRes = await fetch('/api/scores', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ level, score: levelScore, game: 'FlagsGame' }),
+      const scoreRes = await fetch("/api/scores", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ level, score: levelScore, game: "FlagsGame" }),
       });
-      if (!scoreRes.ok) throw new Error('Failed to save score');
+      if (!scoreRes.ok) throw new Error("Failed to save score");
     } catch (error) {
-      console.error('Error saving score:', error);
+      console.error("Error saving score:", error);
+    } finally {
+      setNextLoading(false);
     }
 
     try {
-      const progressRes = await fetch('/api/user-progress', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ levelsPassed: level, game: 'FlagsGame' }),
+      const progressRes = await fetch("/api/user-progress", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ levelsPassed: level, game: "FlagsGame" }),
       });
-      if (!progressRes.ok) throw new Error('Failed to update progress');
+      if (!progressRes.ok) throw new Error("Failed to update progress");
     } catch (error) {
-      console.error('Error updating progress:', error);
+      console.error("Error updating progress:", error);
+    } finally {
+      setNextLoading(false);
     }
 
     setSelectedLetters([]);
     const nextIndex = current + 1;
     if (nextIndex < words.length) {
       setCurrent(nextIndex);
+      setNextLoading(false);
     } else {
       setLevel((prev) => prev + 1);
       setCurrent(0);
       setWords([]);
       setLoading(true);
       try {
-        const wordsRes = await fetch(`/api/words?level=${level + 1}&game=FlagsGame`);
-        if (!wordsRes.ok) throw new Error('Failed to fetch words');
+        const wordsRes = await fetch(
+          `/api/words?level=${level + 1}&game=FlagsGame`
+        );
+        if (!wordsRes.ok) throw new Error("Failed to fetch words");
         const data = await wordsRes.json();
         if (data.length === 0) {
           setLoading(false);
@@ -123,22 +139,53 @@ export default function FlagsGame() {
       } catch (error) {
         console.error(error);
         setLoading(false);
+      } finally {
+        setNextLoading(false);
       }
     }
   };
 
-  if (loading) return <div className="text-center mt-20 text-white text-lg md:text-xl">Loading...</div>;
-  if (!userId) return <div className="text-center mt-20 text-white text-lg md:text-xl">Please sign in to play.</div>;
-  if (words.length === 0) return <div className="text-center mt-20 text-white text-lg md:text-xl">No words available for this level.</div>;
+  if (loading)
+    return (
+      <div className="min-h-screen flex items-center justify-center mt-20 text-white">
+        <ClipLoader
+          loading={loading}
+          size={80}
+          color="#fff"
+          aria-label="Loading Spinner"
+          data-testid="loader"
+        />
+      </div>
+    );
+  if (!userId)
+    return (
+      <div className="min-h-screen text-center mt-20 text-white">
+        Please sign in to play.
+      </div>
+    );
+  if (words.length === 0)
+    return (
+      <div className="min-h-screen text-center mt-20 text-white">
+        No words available for this level.
+      </div>
+    );
 
   const currentWord = words[current];
-  const isComplete = selectedLetters.join('') === currentWord.answer;
+  const isComplete = selectedLetters.join("") === currentWord.answer;
 
   // Dynamically adjust font size based on word length
   const wordLength = currentWord.answer.length;
-  const fontSizeClass = wordLength > 20 ? 'text-lg' : wordLength > 15 ? 'text-xl' : wordLength > 10 ? 'text-2xl' : 'text-4xl';
-  const gapClass = wordLength > 20 ? 'gap-1' : wordLength > 15 ? 'gap-2' : 'gap-4';
-  const paddingClass = wordLength > 20 ? 'px-4 py-2' : 'px-8 py-4';
+  const fontSizeClass =
+    wordLength > 20
+      ? "text-lg"
+      : wordLength > 15
+      ? "text-xl"
+      : wordLength > 10
+      ? "text-2xl"
+      : "text-4xl";
+  const gapClass =
+    wordLength > 20 ? "gap-1" : wordLength > 15 ? "gap-2" : "gap-4";
+  const paddingClass = wordLength > 20 ? "px-4 py-2" : "px-8 py-4";
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-400 to-green-500 flex flex-col items-center justify-between py-4 sm:py-8">
@@ -148,7 +195,9 @@ export default function FlagsGame() {
           <IoArrowBack size={24} className="text-white sm:size-30" />
         </Link>
         <h1 className="text-white text-base sm:text-lg">Category: Flags</h1>
-        <div className="text-white text-base sm:text-lg">Level: {level} | Score: {totalScore}</div>
+        <div className="text-white text-base sm:text-lg">
+          Level: {level} | Score: {totalScore}
+        </div>
       </div>
 
       {/* Main Content */}
@@ -162,10 +211,15 @@ export default function FlagsGame() {
         />
 
         {/* Answer Slots */}
-        <div className={`flex flex-wrap justify-center ${gapClass} bg-white rounded-2xl ${paddingClass} mb-2 max-w-full`}>
-          {currentWord.answer.split('').map((char, index) => (
-            <div key={index} className={`${fontSizeClass} font-bold underline text-gray-400`}>
-              {selectedLetters[index] || '_'}
+        <div
+          className={`flex flex-wrap justify-center ${gapClass} bg-white rounded-2xl ${paddingClass} mb-2 max-w-full`}
+        >
+          {currentWord.answer.split("").map((char, index) => (
+            <div
+              key={index}
+              className={`${fontSizeClass} font-bold underline text-gray-400`}
+            >
+              {selectedLetters[index] || "_"}
             </div>
           ))}
         </div>
@@ -204,13 +258,22 @@ export default function FlagsGame() {
       </div>
 
       {/* Next Button */}
-      <div className="w-full flex flex-col items-center gap-4 px-6 sm:px-8 mt-4 sm:mt-0">
+      <div className="w-full flex flex-col items-center gap-4 px-6">
         <button
           onClick={handleNext}
-          className="bg-white text-black font-bold rounded-full px-10 sm:px-12 py-2 sm:py-3 text-base sm:text-lg disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed w-full sm:w-auto"
-          disabled={!isComplete}
+          className="bg-white text-black font-bold rounded-full px-12 py-3 text-lg disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
+          disabled={!isComplete || nextLoading}
         >
-          NEXT
+          {!nextLoading ? (
+            "NEXT"
+          ) : (
+            <ClipLoader
+              loading={nextLoading}
+              size={20}
+              aria-label="Loading Spinner"
+              data-testid="loader"
+            />
+          )}
         </button>
       </div>
     </div>
