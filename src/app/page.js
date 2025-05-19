@@ -75,6 +75,7 @@ export default function GameDashboard() {
               title="Talking Avatar"
               backgroundColor="#FFCEC0"
               iconSource="/Avatar.png"
+              onClick={() => handleCardClick('/avatar')}
             />
           </div>
         </div>

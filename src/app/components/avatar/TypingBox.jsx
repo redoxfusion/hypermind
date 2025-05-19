@@ -1,5 +1,5 @@
 import { useAILawyer } from "@/hooks/useAILawyer";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 export const TypingBox = () => {
   const askAI = useAILawyer((state) => state.askAI);
@@ -45,8 +45,7 @@ export const TypingBox = () => {
   return (
     <div className="z-10 w-full max-w-[600px] flex flex-col gap-4 bg-gradient-to-tr from-slate-300/30 via-gray-400/30 to-slate-600/30 p-4 backdrop-blur-md rounded-xl border border-slate-100/30 mx-auto">
       <div>
-        <h2 className="text-white font-bold text-lg sm:text-xl">Ask Conva AI Anything</h2>
-        <p className="text-white/65 text-sm sm:text-base">Ask a question and Conva AI will generate a response</p>
+        <p className="text-white/65 text-sm sm:text-base">Ask a question to your virtual friend</p>
       </div>
 
       {loading ? (
