@@ -18,7 +18,7 @@ export default function BottomNavBar() {
   };
 
   const handleScoreClick = () => {
-    router.push("/score");
+    router.push("/leaderboard");
   };
 
   const handleProfileClick = () => {
