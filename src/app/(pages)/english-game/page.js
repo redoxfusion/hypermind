@@ -8,8 +8,9 @@ import {
   IoBackspaceOutline,
   IoTrashOutline,
 } from "react-icons/io5";
-import { useAuth } from "@clerk/nextjs";
+import { RedirectToSignIn, useAuth } from "@clerk/nextjs";
 import { ClipLoader } from "react-spinners";
+import { useRouter } from "nextjs-toploader/app";
 
 export default function EnglishGame() {
   const { userId } = useAuth();
@@ -21,13 +22,18 @@ export default function EnglishGame() {
   const [level, setLevel] = useState(1);
   const [score, setScore] = useState(0);
   const [totalScore, setTotalScore] = useState(0);
+  const [resetMessage, setResetMessage] = useState(null);
+  const [resetError, setResetError] = useState(null);
+  const [resetLoading, setResetLoading] = useState(false);
 
   useEffect(() => {
     async function fetchProgressAndWords() {
       if (!userId) {
         setLoading(false);
+        console.log("User not authenticated, redirecting to sign-in");
         return;
       }
+      setLoading(true);
 
       try {
         // Fetch user progress
@@ -44,6 +50,7 @@ export default function EnglishGame() {
         if (!wordsRes.ok) throw new Error("Failed to fetch words");
         const data = await wordsRes.json();
         if (data.length === 0) {
+          // setLoading(false);
           return;
         }
         setWords(data);
@@ -64,6 +71,10 @@ export default function EnglishGame() {
 
     fetchProgressAndWords();
   }, [userId]);
+
+  if (!userId) {
+    return <RedirectToSignIn />;
+  }
 
   const handleLetterClick = (letter) => {
     if (selectedLetters.length < currentWord.answer.length) {
@@ -99,8 +110,6 @@ export default function EnglishGame() {
       if (!scoreRes.ok) throw new Error("Failed to save score");
     } catch (error) {
       console.error("Error saving score:", error);
-    } finally {
-      setNextLoading(false);
     }
 
     // Update progress
@@ -113,8 +122,6 @@ export default function EnglishGame() {
       if (!progressRes.ok) throw new Error("Failed to update progress");
     } catch (error) {
       console.error("Error updating progress:", error);
-    } finally {
-      setNextLoading(false);
     }
 
     // Move to next word or level
@@ -131,7 +138,7 @@ export default function EnglishGame() {
       // Fetch new words for next level
       try {
         const wordsRes = await fetch(
-          `/api/words?level=${level + 1}?game=EnglishGame`
+          `/api/words?level=${level + 1}&game=EnglishGame`
         );
         if (!wordsRes.ok) throw new Error("Failed to fetch words");
         const data = await wordsRes.json();
@@ -140,13 +147,62 @@ export default function EnglishGame() {
           return;
         }
         setWords(data);
-        setLoading(false);
       } catch (error) {
         console.error(error);
-        setLoading(false);
       } finally {
+        setLoading(false);
         setNextLoading(false);
       }
+    }
+  };
+
+  const handleResetProgress = async () => {
+    setResetLoading(true);
+    if (!userId) return;
+
+    if (
+      !window.confirm(
+        "Are you sure you want to reset your progress? This will clear your scores and level for EnglishGame."
+      )
+    ) {
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/user-progress/reset", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ game: "EnglishGame" }),
+      });
+      const data = await response.json();
+      if (!response.ok)
+        throw new Error(data.error || "Failed to reset progress");
+      setResetMessage(data.message);
+      setResetError(null);
+      // Reset local state
+      setLevel(1);
+      setScore(0);
+      setTotalScore(0);
+      setCurrent(0);
+      setSelectedLetters([]);
+      // Refetch words for level 1
+      setLoading(true);
+      const wordsRes = await fetch("/api/words?level=1&game=EnglishGame");
+      if (!wordsRes.ok) throw new Error("Failed to fetch words");
+      const dataWords = await wordsRes.json();
+      if (dataWords.length === 0) {
+        setWords([]);
+        setLoading(false);
+        return;
+      }
+      setWords(dataWords);
+    } catch (error) {
+      console.error("Error resetting progress:", error);
+      setResetError(error.message);
+      setResetMessage(null);
+    } finally {
+      setLoading(false);
+      setResetLoading(false);
     }
   };
 
@@ -160,12 +216,6 @@ export default function EnglishGame() {
           aria-label="Loading Spinner"
           data-testid="loader"
         />
-      </div>
-    );
-  if (!userId)
-    return (
-      <div className="min-h-screen text-center mt-20 text-white">
-        Please sign in to play.
       </div>
     );
   if (words.length === 0)
@@ -185,7 +235,7 @@ export default function EnglishGame() {
           <IoArrowBack size={30} className="text-white" />
         </Link>
         <h1 className="text-white text-lg">Category: Animals</h1>
-        <div className="text-white text-lg">
+        <div className="text-white text-lg min-w-fit">
           Level: {level} | Score: {totalScore}
         </div>
       </div>
@@ -247,7 +297,7 @@ export default function EnglishGame() {
       <div className="w-full flex flex-col items-center gap-4 px-6">
         <button
           onClick={handleNext}
-          className="bg-white text-black font-bold rounded-full px-12 py-3 text-lg disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
+          className="bg-white text-black font-bold rounded-full mt-3 px-12 py-3 text-lg disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
           disabled={!isComplete || nextLoading}
         >
           {!nextLoading ? (
@@ -261,6 +311,28 @@ export default function EnglishGame() {
             />
           )}
         </button>
+        {level > 1 && (
+          <button
+            onClick={handleResetProgress}
+            className="bg-red-600 text-white font-bold rounded-full px-12 py-3 text-lg hover:bg-red-700 cursor-pointer"
+          >
+            {resetLoading ? (
+              <ClipLoader
+                loading={resetLoading}
+                size={20}
+                className="ml-2"
+                aria-label="Loading Spinner"
+                data-testid="loader"
+              />
+            ) : (
+              "Reset Progress"
+            )}
+          </button>
+        )}
+        {resetMessage && (
+          <p className="text-green-400 text-center">{resetMessage}</p>
+        )}
+        {resetError && <p className="text-red-400 text-center">{resetError}</p>}
       </div>
     </div>
   );

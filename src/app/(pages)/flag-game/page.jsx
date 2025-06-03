@@ -1,15 +1,16 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
+import { useEffect, useState } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
 import {
   IoArrowBack,
   IoBackspaceOutline,
+  IoTrash,
   IoTrashOutline,
-} from "react-icons/io5";
-import { useAuth } from "@clerk/nextjs";
-import { ClipLoader } from "react-spinners";
+} from 'react-icons/io5';
+import { RedirectToSignIn, useAuth } from '@clerk/nextjs';
+import { ClipLoader } from 'react-spinners';
 
 export default function FlagsGame() {
   const { userId } = useAuth();
@@ -21,6 +22,9 @@ export default function FlagsGame() {
   const [level, setLevel] = useState(1);
   const [score, setScore] = useState(0);
   const [totalScore, setTotalScore] = useState(0);
+  const [resetMessage, setResetMessage] = useState(null);
+  const [resetError, setResetError] = useState(null);
+  const [resetLoading, setResetLoading] = useState(false);
 
   useEffect(() => {
     async function fetchProgressAndWords() {
@@ -29,10 +33,12 @@ export default function FlagsGame() {
         return;
       }
 
+      setLoading(true);
+
       try {
         // Fetch user progress
-        const progressRes = await fetch("/api/user-progress?game=FlagsGame");
-        if (!progressRes.ok) throw new Error("Failed to fetch progress");
+        const progressRes = await fetch('/api/user-progress?game=FlagsGame');
+        if (!progressRes.ok) throw new Error('Failed to fetch progress');
         const { levelsPassed } = await progressRes.json();
         const initialLevel = levelsPassed + 1;
         setLevel(initialLevel);
@@ -41,7 +47,7 @@ export default function FlagsGame() {
         const wordsRes = await fetch(
           `/api/words?level=${initialLevel}&game=FlagsGame`
         );
-        if (!wordsRes.ok) throw new Error("Failed to fetch words");
+        if (!wordsRes.ok) throw new Error('Failed to fetch words');
         const data = await wordsRes.json();
         if (data.length === 0) {
           return;
@@ -49,7 +55,7 @@ export default function FlagsGame() {
         setWords(data);
 
         // Fetch total score
-        const scoresRes = await fetch("/api/scores?game=FlagsGame");
+        const scoresRes = await fetch('/api/scores?game=FlagsGame');
         if (scoresRes.ok) {
           const scores = await scoresRes.json();
           const total = scores.reduce((sum, s) => sum + s.score, 0);
@@ -64,6 +70,10 @@ export default function FlagsGame() {
 
     fetchProgressAndWords();
   }, [userId]);
+
+  if (!userId) {
+    return <RedirectToSignIn />;
+  }
 
   const handleLetterClick = (letter) => {
     if (selectedLetters.length < currentWord.answer.length) {
@@ -89,29 +99,25 @@ export default function FlagsGame() {
     setTotalScore(totalScore + levelScore);
 
     try {
-      const scoreRes = await fetch("/api/scores", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ level, score: levelScore, game: "FlagsGame" }),
+      const scoreRes = await fetch('/api/scores', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ level, score: levelScore, game: 'FlagsGame' }),
       });
-      if (!scoreRes.ok) throw new Error("Failed to save score");
+      if (!scoreRes.ok) throw new Error('Failed to save score');
     } catch (error) {
-      console.error("Error saving score:", error);
-    } finally {
-      setNextLoading(false);
+      console.error('Error saving score:', error);
     }
 
     try {
-      const progressRes = await fetch("/api/user-progress", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ levelsPassed: level, game: "FlagsGame" }),
+      const progressRes = await fetch('/api/user-progress', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ levelsPassed: level, game: 'FlagsGame' }),
       });
-      if (!progressRes.ok) throw new Error("Failed to update progress");
+      if (!progressRes.ok) throw new Error('Failed to update progress');
     } catch (error) {
-      console.error("Error updating progress:", error);
-    } finally {
-      setNextLoading(false);
+      console.error('Error updating progress:', error);
     }
 
     setSelectedLetters([]);
@@ -128,20 +134,68 @@ export default function FlagsGame() {
         const wordsRes = await fetch(
           `/api/words?level=${level + 1}&game=FlagsGame`
         );
-        if (!wordsRes.ok) throw new Error("Failed to fetch words");
+        if (!wordsRes.ok) throw new Error('Failed to fetch words');
         const data = await wordsRes.json();
         if (data.length === 0) {
           setLoading(false);
           return;
         }
         setWords(data);
-        setLoading(false);
       } catch (error) {
         console.error(error);
-        setLoading(false);
       } finally {
+        setLoading(false);
         setNextLoading(false);
       }
+    }
+  };
+
+  const handleResetProgress = async () => {
+    if (!userId) return;
+
+    if (
+      !window.confirm(
+        'Are you sure you want to reset your progress? This will clear your scores and level for FlagsGame.'
+      )
+    ) {
+      return;
+    }
+
+    setResetLoading(true);
+    try {
+      const response = await fetch('/api/user-progress/reset', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ game: 'FlagsGame' }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Failed to reset progress');
+      setResetMessage(data.message);
+      setResetError(null);
+      // Reset local state
+      setLevel(1);
+      setScore(0);
+      setTotalScore(0);
+      setCurrent(0);
+      setSelectedLetters([]);
+      // Refetch words for level 1
+      setLoading(true);
+      const wordsRes = await fetch('/api/words?level=1&game=FlagsGame');
+      if (!wordsRes.ok) throw new Error('Failed to fetch words');
+      const dataWords = await wordsRes.json();
+      if (dataWords.length === 0) {
+        setWords([]);
+        setLoading(false);
+        return;
+      }
+      setWords(dataWords);
+    } catch (error) {
+      console.error('Error resetting progress:', error);
+      setResetError(error.message);
+      setResetMessage(null);
+    } finally {
+      setLoading(false);
+      setResetLoading(false);
     }
   };
 
@@ -157,12 +211,6 @@ export default function FlagsGame() {
         />
       </div>
     );
-  if (!userId)
-    return (
-      <div className="min-h-screen text-center mt-20 text-white">
-        Please sign in to play.
-      </div>
-    );
   if (words.length === 0)
     return (
       <div className="min-h-screen text-center mt-20 text-white">
@@ -171,21 +219,21 @@ export default function FlagsGame() {
     );
 
   const currentWord = words[current];
-  const isComplete = selectedLetters.join("") === currentWord.answer;
+  const isComplete = selectedLetters.join('') === currentWord.answer;
 
   // Dynamically adjust font size based on word length
   const wordLength = currentWord.answer.length;
   const fontSizeClass =
     wordLength > 20
-      ? "text-lg"
+      ? 'text-lg'
       : wordLength > 15
-      ? "text-xl"
+      ? 'text-xl'
       : wordLength > 10
-      ? "text-2xl"
-      : "text-4xl";
+      ? 'text-2xl'
+      : 'text-4xl';
   const gapClass =
-    wordLength > 20 ? "gap-1" : wordLength > 15 ? "gap-2" : "gap-4";
-  const paddingClass = wordLength > 20 ? "px-4 py-2" : "px-8 py-4";
+    wordLength > 20 ? 'gap-1' : wordLength > 15 ? 'gap-2' : 'gap-4';
+  const paddingClass = wordLength > 20 ? 'px-4 py-2' : 'px-8 py-4';
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-400 to-green-500 flex flex-col items-center justify-between py-4 sm:py-8">
@@ -214,12 +262,12 @@ export default function FlagsGame() {
         <div
           className={`flex flex-wrap justify-center ${gapClass} bg-white rounded-2xl ${paddingClass} mb-2 max-w-full`}
         >
-          {currentWord.answer.split("").map((char, index) => (
+          {currentWord.answer.split('').map((char, index) => (
             <div
               key={index}
               className={`${fontSizeClass} font-bold underline text-gray-400`}
             >
-              {selectedLetters[index] || "_"}
+              {selectedLetters[index] || '_'}
             </div>
           ))}
         </div>
@@ -228,17 +276,17 @@ export default function FlagsGame() {
         <div className="flex gap-3 sm:gap-4 mb-4 sm:mb-6">
           <button
             onClick={handleBackspace}
-            className="bg-white text-black rounded-full p-3 sm:p-2 hover:bg-gray-200"
+            className="flex items-center bg-white text-black rounded p-3 sm:p-1 hover:bg-gray-50"
             disabled={selectedLetters.length === 0}
           >
-            <IoBackspaceOutline size={20} className="sm:size-24" />
+            <IoArrowBack className="size-6 sm:size-8" />
           </button>
           <button
             onClick={handleClear}
-            className="bg-white text-black rounded-full p-3 sm:p-2 hover:bg-gray-200"
+            className="flex items-center bg-white text-black rounded p-3 sm:p-1 sm:pl-10 hover:bg-gray-50"
             disabled={selectedLetters.length === 0}
           >
-            <IoTrashOutline size={20} className="sm:size-24" />
+            <IoTrash className="size-6 sm:size-8" />
           </button>
         </div>
 
@@ -257,15 +305,15 @@ export default function FlagsGame() {
         </div>
       </div>
 
-      {/* Next Button */}
+      {/* Next and Reset Buttons */}
       <div className="w-full flex flex-col items-center gap-4 px-6">
         <button
           onClick={handleNext}
-          className="bg-white text-black font-bold rounded-full px-12 py-3 text-lg disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
+          className="bg-white text-black font-bold rounded-full mt-3 px-12 py-3 text-lg disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
           disabled={!isComplete || nextLoading}
         >
           {!nextLoading ? (
-            "NEXT"
+            'NEXT'
           ) : (
             <ClipLoader
               loading={nextLoading}
@@ -275,6 +323,26 @@ export default function FlagsGame() {
             />
           )}
         </button>
+        {level > 1 && (
+          <button
+            onClick={handleResetProgress}
+            className="bg-red-600 text-white font-bold rounded-full px-12 py-3 text-lg hover:bg-red-700 cursor-pointer"
+            disabled={resetLoading}
+          >
+            {resetLoading ? (
+              <ClipLoader
+                loading={resetLoading}
+                size={20}
+                aria-label="Loading Spinner"
+                data-testid="loader"
+              />
+            ) : (
+              'Reset Progress'
+            )}
+          </button>
+        )}
+        {resetMessage && <p className="text-green-400 text-center">{resetMessage}</p>}
+        {resetError && <p className="text-red-400 text-center">{resetError}</p>}
       </div>
     </div>
   );
