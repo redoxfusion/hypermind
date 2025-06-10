@@ -14,9 +14,12 @@ import { randInt } from "three/src/math/MathUtils";
 
 const ANIMATION_FADE_TIME = 0.5;
 
+const CHARACTER_FILE = "/models/fox.glb";
+const ANIMATIONS_FILE = "/models/animations_fox.glb";
+
 export function Avatar({ Avatar, ...props }) {
   const group = useRef();
-  const { scene } = useGLTF(`/models/679b97cb35ba37903d22e6f5.glb`);
+  const { scene } = useGLTF(CHARACTER_FILE);
   useEffect(() => {
     scene.traverse((child) => {
       if (child.material) {
@@ -29,7 +32,7 @@ export function Avatar({ Avatar, ...props }) {
 
   const currentMessage = useAILawyer((state) => state.currentMessage);
   const loading = useAILawyer((state) => state.loading);
-  const { animations } = useGLTF(`/models/animations.glb`);
+  const { animations } = useGLTF(ANIMATIONS_FILE);
   const { actions, mixer } = useAnimations(animations, group);
   const [animation, setAnimation] = useState("Idle");
 
@@ -152,7 +155,7 @@ export function Avatar({ Avatar, ...props }) {
   return (
     <group {...props} dispose={null} ref={group}>
       {loading && (
-        <Html position-y={Avatar === "679b97cb35ba37903d22e6f5" ? 1.6 : 1.8}>
+        <Html position-y={Avatar === "Naoki" ? 1.6 : 1.8}>
           <div className="flex justify-center items-center -translate-x-1/2">
             <span className="relative flex h-8 w-8 items-center justify-center">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
@@ -169,6 +172,6 @@ export function Avatar({ Avatar, ...props }) {
 }
 
 lawyers.forEach((Avatar) => {
-  useGLTF.preload(`/models/679b97cb35ba37903d22e6f5.glb`);
-  useGLTF.preload(`/models/animations.glb`);
+  useGLTF.preload(CHARACTER_FILE);
+  useGLTF.preload(ANIMATIONS_FILE);
 });
