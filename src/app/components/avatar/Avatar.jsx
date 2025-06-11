@@ -34,7 +34,7 @@ export function Avatar({ Avatar, ...props }) {
   const loading = useAILawyer((state) => state.loading);
   const { animations } = useGLTF(ANIMATIONS_FILE);
   const { actions, mixer } = useAnimations(animations, group);
-  const [animation, setAnimation] = useState("Idle");
+  const [animation, setAnimation] = useState("Standing Idle");
 
   // Imported from r3f-virtual-girlfriend project
   const [blink, setBlink] = useState(false);
@@ -57,15 +57,15 @@ export function Avatar({ Avatar, ...props }) {
     let interval = null;
 
     if (loading) {
-      setAnimation("Idle");
+      setAnimation("Bored Stand");
     } else if (currentMessage) {
-      setAnimation("Talking1"); // Start with Talking1
+      setAnimation("Talking"); // Start with Talking1
 
       interval = setInterval(() => {
-        setAnimation("Talking1"); // Keeps setting Talking1 to refresh animation
+        setAnimation("Talking"); // Keeps setting Talking1 to refresh animation
       }, 0); // Adjust interval time as needed
     } else {
-      setAnimation("Idle");
+      setAnimation("Standing Idle");
     }
 
     return () => {
@@ -101,7 +101,7 @@ export function Avatar({ Avatar, ...props }) {
         actions[animation]?.getClip()?.duration - ANIMATION_FADE_TIME
       ) {
         setAnimation((animation) =>
-          animation === "Talking" ? "Talking1" : "Talking"
+          animation === "Talking" ? "Talking 2" : "Talking"
         ); // Could load more type of animations and randomization here
       }
     }
@@ -155,7 +155,7 @@ export function Avatar({ Avatar, ...props }) {
   return (
     <group {...props} dispose={null} ref={group}>
       {loading && (
-        <Html position-y={Avatar === "Naoki" ? 1.6 : 1.8}>
+        <Html position-y={Avatar === "fox" ? 1.6 : 1.8}>
           <div className="flex justify-center items-center -translate-x-1/2">
             <span className="relative flex h-8 w-8 items-center justify-center">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
