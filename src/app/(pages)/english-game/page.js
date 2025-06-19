@@ -65,18 +65,26 @@ export default function EnglishGame() {
     fetchProgressAndWords();
   }, [userId]);
 
-  const handleNext = useCallback(async () => {
+  const handleNext = useCallback(async (isTimeout = false) => {
     if (!userId) return;
 
     setNextLoading(true);
     setTimeLeft(30); // Reset timer for next word
 
-    // Award points only for correct answers
+    // Handle scoring: +10 for correct answers, -5 for timeout, 0 for incorrect manual submission
     const currentWord = words[current];
     const isCorrect = selectedLetters.join("") === currentWord.answer;
-    const levelScore = isCorrect ? 10 : 0;
-    setScore(score + levelScore);
-    setTotalScore(totalScore + levelScore);
+    let levelScore = 0;
+
+    if (isTimeout) {
+      levelScore = -5; // Deduct 5 points for timeout
+      setScore(Math.max(0, score + levelScore));
+      setTotalScore(Math.max(0, totalScore + levelScore));
+    } else if (isCorrect) {
+      levelScore = 10; // Award 10 points for correct answer
+      setScore(score + levelScore);
+      setTotalScore(totalScore + levelScore);
+    }
 
     try {
       await fetch("/api/scores", {
@@ -98,7 +106,6 @@ export default function EnglishGame() {
     if (nextIndex < words.length) {
       setCurrent(nextIndex);
       setNextLoading(false);
-      setTimeLeft(30); // Reset timer for next word
     } else {
       setLevel((prev) => prev + 1);
       setCurrent(0);
@@ -120,7 +127,6 @@ export default function EnglishGame() {
       } finally {
         setLoading(false);
         setNextLoading(false);
-        setTimeLeft(30); // Reset timer for next word
       }
     }
   }, [userId, words, current, selectedLetters, score, totalScore, level]);
@@ -129,14 +135,13 @@ export default function EnglishGame() {
     if (timeLeft > 0 && current < words.length) {
       const timer = setInterval(() => setTimeLeft(timeLeft - 1), 1000);
       return () => clearInterval(timer);
-    } else if (timeLeft === 0) {
-      handleNext(); // Auto-proceed when timer runs out
+    } else if (timeLeft === 0 && current < words.length) {
+      handleNext(true); // Pass isTimeout=true when timer runs out
     }
   }, [timeLeft, current, words.length, handleNext]);
 
-  
   const handleLetterClick = (letter) => {
-    if (selectedLetters.length < currentWord.answer.length) {
+    if (selectedLetters.length < words[current].answer.length) {
       setSelectedLetters([...selectedLetters, letter]);
     }
   };
@@ -211,7 +216,8 @@ export default function EnglishGame() {
         />
       </div>
     );
-    if (words.length === 0)
+
+  if (words.length === 0)
     return (
       <div className="min-h-screen text-center mt-20 text-white">
         <h2>Game Over!</h2>
@@ -306,7 +312,7 @@ export default function EnglishGame() {
 
       <div className="w-full flex flex-col items-center gap-4 px-6">
         <button
-          onClick={handleNext}
+          onClick={() => handleNext(false)}
           className="bg-white text-black font-bold rounded-full mt-3 px-12 py-3 text-lg disabled:opacity-50 cursor-pointer"
           disabled={nextLoading}
         >

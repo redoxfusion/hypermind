@@ -43,7 +43,7 @@ export default function FlagsGame() {
         setLevel(initialLevel);
 
         const flagsRes = await fetch(
-          `/api/words?level=${initialLevel}&game=FlagsGame`
+          `/api/flags?level=${initialLevel}&game=FlagsGame`
         );
         if (!flagsRes.ok) throw new Error("Failed to fetch flags");
         const data = await flagsRes.json();
@@ -65,18 +65,26 @@ export default function FlagsGame() {
     fetchProgressAndFlags();
   }, [userId]);
 
-  const handleNext = useCallback(async () => {
+  const handleNext = useCallback(async (isTimeout = false) => {
     if (!userId) return;
 
     setNextLoading(true);
     setTimeLeft(30); // Reset timer for next flag
 
-    // Award points only for correct answers
+    // Handle scoring: +10 for correct answers, -5 for timeout, 0 for incorrect manual submission
     const currentFlag = flags[current];
     const isCorrect = selectedLetters.join("") === currentFlag.answer;
-    const levelScore = isCorrect ? 10 : 0;
-    setScore(score + levelScore);
-    setTotalScore(totalScore + levelScore);
+    let levelScore = 0;
+
+    if (isTimeout) {
+      levelScore = -5; // Deduct 5 points for timeout
+      setScore(Math.max(0, score + levelScore));
+      setTotalScore(Math.max(0, totalScore + levelScore));
+    } else if (isCorrect) {
+      levelScore = 10; // Award 10 points for correct answer
+      setScore(score + levelScore);
+      setTotalScore(totalScore + levelScore);
+    }
 
     try {
       await fetch("/api/scores", {
@@ -98,7 +106,6 @@ export default function FlagsGame() {
     if (nextIndex < flags.length) {
       setCurrent(nextIndex);
       setNextLoading(false);
-      setTimeLeft(30); // Reset timer for next word
     } else {
       setLevel((prev) => prev + 1);
       setCurrent(0);
@@ -119,7 +126,6 @@ export default function FlagsGame() {
         console.error(error);
       } finally {
         setLoading(false);
-        setTimeLeft(30); // Reset timer for next word
         setNextLoading(false);
       }
     }
@@ -129,13 +135,14 @@ export default function FlagsGame() {
     if (timeLeft > 0 && current < flags.length) {
       const timer = setInterval(() => setTimeLeft(timeLeft - 1), 1000);
       return () => clearInterval(timer);
-    } else if (timeLeft === 0) {
-      handleNext(); // Auto-proceed when timer runs out
+    }
+    if (timeLeft === 0 && current < flags.length) {
+      handleNext(true); // Pass isTimeout=true when timer runs out
     }
   }, [timeLeft, current, flags.length, handleNext]);
 
   const handleLetterClick = (letter) => {
-    if (selectedLetters.length < currentFlag.answer.length) {
+    if (selectedLetters.length < flags[current].answer.length) {
       setSelectedLetters([...selectedLetters, letter]);
     }
   };
@@ -283,7 +290,7 @@ export default function FlagsGame() {
           </button>
           <button
             onClick={handleClear}
-            className="bg-white text-black rounded-full p-2 hover:bg-gray-200"
+            className="bow-white text-black rounded-full p-2 hover:bg-gray-200"
             disabled={selectedLetters.length === 0}
           >
             <IoTrashOutline size={24} />
@@ -306,7 +313,7 @@ export default function FlagsGame() {
 
       <div className="w-full flex flex-col items-center gap-4 px-6">
         <button
-          onClick={handleNext}
+          onClick={() => handleNext(false)}
           className="bg-white text-black font-bold rounded-full mt-3 px-12 py-3 text-lg disabled:opacity-50 cursor-pointer"
           disabled={nextLoading}
         >
@@ -345,5 +352,6 @@ export default function FlagsGame() {
         {resetError && <p className="text-red-400 text-center">{resetError}</p>}
       </div>
     </div>
+    
   );
 }

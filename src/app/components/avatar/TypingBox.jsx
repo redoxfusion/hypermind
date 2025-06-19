@@ -74,11 +74,7 @@ export const TypingBox = () => {
               Ask
             </button>
             <button
-              className={`text-white p-2 px-4 rounded-full w-full sm:w-auto ${
-                recording
-                  ? "bg-red-500 opacity-50"
-                  : "bg-red-500 hover:bg-red-600"
-              }`}
+              className={`text-white p-2 px-4 rounded-full w-full sm:w-auto cursor-pointer bg-red-500 hover:bg-red-600 disabled:bg-red-950`}
               onClick={startRecording}
               disabled={recording}
             >

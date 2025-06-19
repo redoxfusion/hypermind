@@ -56,7 +56,9 @@ export const useAILawyer = create((set, get) => ({
 
     // Ask AI
     const res = await fetch(`/api/ai?question=${question}&speech=${speech}`);
+    console.log("AI Response:", res);
     const data = await res.json();
+    console.log("AI Data:", data);
     message.answer = data;
     message.speech = speech;
 

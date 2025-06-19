@@ -19,22 +19,78 @@ import { TypingBox } from "./TypingBox";
 export const Experience = () => {
   const teacher = useAILawyer((state) => state.teacher);
   const [isMobile, setIsMobile] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [currentAnimation, setCurrentAnimation] = useState("bored");
 
   // Check for mobile screen
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
     };
-    handleResize(); // initial check
+    handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Animation control based on talking state
+  const isTalking = useAILawyer((state) => state.currentMessage);
+  useEffect(() => {
+    if (isTalking) {
+      setCurrentAnimation("talking");
+    } else if (currentAnimation === "talking") {
+      setCurrentAnimation("bored");
+    }
+  }, [isTalking, currentAnimation]);
+
+  const animations = [
+    "bored",
+    "hip_hop_dancing",
+    "talking",
+    "salsa_dancing",
+    "dwarf_idle",
+    "standing_arguing",
+  ];
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const selectAnimation = (animation) => {
+    if (animation !== "talking") {
+      setCurrentAnimation(animation);
+    }
+    setIsMenuOpen(false);
+  };
+
   return (
     <>
       {/* Typing Box */}
-      <div className="z-10 md:justify-center fixed bottom-4 left-4 right-4 flex gap-3 flex-wrap justify-stretch px-4 md:px-8">
+      <div className="z-10 md:justify-center fixed mt-5 left-4 right-4 flex gap-3 flex-wrap justify-stretch px-4 md:px-8">
         <TypingBox />
+      </div>
+
+      {/* Circular Menu */}
+      <div className="fixed bottom-8 right-8 z-20">
+        <button
+          onClick={toggleMenu}
+          className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center text-white text-xl shadow-lg hover:bg-blue-600 transition"
+        >
+          ☰
+        </button>
+        {isMenuOpen && (
+          <div className="absolute bottom-20 right-0 flex flex-col gap-2">
+            {animations.map((animation) => (
+              <button
+                key={animation}
+                onClick={() => selectAnimation(animation)}
+                className="w-12 h-12 bg-gray-800 rounded-full text-white text-sm flex items-center justify-center hover:bg-gray-700 transition"
+                title={animation.replace(/_/g, " ")}
+              >
+                {animation.charAt(0).toUpperCase()}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       <Leva hidden />
@@ -66,6 +122,7 @@ export const Experience = () => {
               position={isMobile ? [0, -2, -3.5] : [-1, -1.7, -3]}
               scale={isMobile ? 1.2 : 1.5}
               rotation-y={degToRad(isMobile ? 0 : 22)}
+              animation={currentAnimation}
             />
           </Float>
         </Suspense>
@@ -81,7 +138,7 @@ const CameraManager = () => {
 
   useEffect(() => {
     if (loading || currentMessage) {
-      controls.current?.setPosition(0.05, 0, 0.1, true);
+      controls.current?.setPosition(0, 0, 0.0001, true);
       controls.current?.zoomTo(1.3, true);
     }
   }, [loading, currentMessage]);

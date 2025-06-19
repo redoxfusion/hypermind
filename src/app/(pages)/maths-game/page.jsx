@@ -64,18 +64,26 @@ export default function MathsGame() {
     fetchProgressAndProblems();
   }, [userId]);
 
-  const handleNext = useCallback(async () => {
+  const handleNext = useCallback(async (isTimeout = false) => {
     if (!userId) return;
 
     setNextLoading(true);
     setTimeLeft(30); // Reset timer for next problem
 
-    // Award points only for correct answers
+    // Handle scoring: +10 for correct answers, -5 for timeout, 0 for incorrect manual submission
     const currentProblem = problems[current];
     const isCorrect = selectedAnswer === currentProblem.answer;
-    const levelScore = isCorrect ? 10 : 0;
-    setScore(score + levelScore);
-    setTotalScore(totalScore + levelScore);
+    let levelScore = 0;
+
+    if (isTimeout) {
+      levelScore = -5; // Deduct 5 points for timeout
+      setScore(Math.max(0, score + levelScore));
+      setTotalScore(Math.max(0, totalScore + levelScore));
+    } else if (isCorrect) {
+      levelScore = 10; // Award 10 points for correct answer
+      setScore(score + levelScore);
+      setTotalScore(totalScore + levelScore);
+    }
 
     try {
       await fetch("/api/scores", {
@@ -92,14 +100,11 @@ export default function MathsGame() {
       console.error("Error saving data:", error);
     }
 
-    setTimeLeft(30); // Reset timer for next problem
-
     setSelectedAnswer(null);
     const nextIndex = current + 1;
     if (nextIndex < problems.length) {
       setCurrent(nextIndex);
       setNextLoading(false);
-      setTimeLeft(30); // Reset timer for next problem
     } else {
       setLevel((prev) => prev + 1);
       setCurrent(0);
@@ -121,7 +126,6 @@ export default function MathsGame() {
       } finally {
         setLoading(false);
         setNextLoading(false);
-        setTimeLeft(30); // Reset timer for next problem
       }
     }
   }, [userId, problems, current, selectedAnswer, score, totalScore, level]);
@@ -130,8 +134,8 @@ export default function MathsGame() {
     if (timeLeft > 0 && current < problems.length) {
       const timer = setInterval(() => setTimeLeft(timeLeft - 1), 1000);
       return () => clearInterval(timer);
-    } else if (timeLeft === 0) {
-      handleNext(); // Auto-proceed when timer runs out
+    } else if (timeLeft === 0 && current < problems.length) {
+      handleNext(true); // Pass isTimeout=true when timer runs out
     }
   }, [timeLeft, current, problems.length, handleNext]);
 
@@ -300,7 +304,7 @@ export default function MathsGame() {
 
       <div className="w-full flex flex-col items-center gap-4 px-6">
         <button
-          onClick={handleNext}
+          onClick={() => handleNext(false)}
           className="bg-white text-black font-bold rounded-full mt-3 px-12 py-3 text-lg disabled:opacity-50 cursor-pointer"
           disabled={nextLoading}
         >
