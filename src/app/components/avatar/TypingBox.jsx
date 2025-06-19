@@ -32,13 +32,23 @@ export const TypingBox = () => {
   };
 
   const startRecording = () => {
+    console.log("Starting recording...");
     if (recognition) {
+      console.log("Speech recognition is available.");
       setRecording(true);
       recognition.start();
       recognition.onresult = (event) => {
         setQuestion(event.results[0][0].transcript);
+        console.log("Recognized text:", event.results[0][0].transcript);
+      };
+      recognition.onerror = (event) => {
+        console.error("Speech recognition error:", event.error);
       };
       recognition.onend = () => setRecording(false);
+    }
+    else {
+      console.error("Speech recognition is not supported in this browser.");
+      alert("Speech recognition is not supported in this browser.");
     }
   };
 

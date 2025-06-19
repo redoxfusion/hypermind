@@ -43,7 +43,7 @@ export default function FlagsGame() {
         setLevel(initialLevel);
 
         const flagsRes = await fetch(
-          `/api/flags?level=${initialLevel}&game=FlagsGame`
+          `/api/words?level=${initialLevel}&game=FlagsGame`
         );
         if (!flagsRes.ok) throw new Error("Failed to fetch flags");
         const data = await flagsRes.json();
@@ -113,7 +113,7 @@ export default function FlagsGame() {
       setLoading(true);
       try {
         const flagsRes = await fetch(
-          `/api/flags?level=${level + 1}&game=FlagsGame`
+          `/api/words?level=${level + 1}&game=FlagsGame`
         );
         if (!flagsRes.ok) throw new Error("Failed to fetch flags");
         const data = await flagsRes.json();
@@ -184,7 +184,7 @@ export default function FlagsGame() {
       setCurrent(0);
       setSelectedLetters([]);
       setLoading(true);
-      const flagsRes = await fetch("/api/flags?level=1&game=FlagsGame");
+      const flagsRes = await fetch("/api/words?level=1&game=FlagsGame");
       if (!flagsRes.ok) throw new Error("Failed to fetch flags");
       const dataFlags = await flagsRes.json();
       if (dataFlags.length === 0) {
