@@ -4,7 +4,6 @@ import {
   CameraControls,
   Environment,
   Float,
-  Html,
   Loader,
   useGLTF,
 } from "@react-three/drei";
@@ -12,15 +11,15 @@ import { Canvas } from "@react-three/fiber";
 import { Leva, button, useControls } from "leva";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { degToRad } from "three/src/math/MathUtils";
-import { MessagesList } from "./MessagesList";
 import { Avatar } from "./Avatar";
 import { TypingBox } from "./TypingBox";
 
 export const Experience = () => {
-  const teacher = useAILawyer((state) => state.teacher);
   const [isMobile, setIsMobile] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [currentAnimation, setCurrentAnimation] = useState("bored");
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
+  const audioRef = useRef(null);
 
   // Check for mobile screen
   useEffect(() => {
@@ -31,6 +30,35 @@ export const Experience = () => {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  
+  // Play background music
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (audio) {
+      audio.loop = true;
+      audio.volume = 0.1; // Adjust volume as needed
+    }
+  }, [isAudioPlaying]);
+
+  // Toggle audio play/pause
+  const toggleAudio = () => {
+    const audio = audioRef.current;
+    if (audio) {
+      if (isAudioPlaying) {
+        audio.pause();
+        setIsAudioPlaying(false);
+      } else {
+        audio.play().then(() => {
+          setIsAudioPlaying(true);
+        }).catch((error) => {
+          setIsAudioPlaying(false);
+          // Handle playback error, e.g., user interaction required
+          console.warn("Audio playback failed:", error);
+        });
+      }
+    }
+  };
 
   // Animation control based on talking state
   const isTalking = useAILawyer((state) => state.currentMessage);
@@ -64,6 +92,19 @@ export const Experience = () => {
 
   return (
     <>
+      {/* Background Music */}
+      <audio ref={audioRef} src="/music/ambient-lounge-instrumental.mp3" />
+      {/* Audio Control Button */}
+      <div className="fixed bottom-8 left-8 z-20">
+        <button
+          onClick={toggleAudio}
+          className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center text-white text-xl shadow-lg hover:bg-blue-600 transition"
+          title={isAudioPlaying ? "Pause Music" : "Play Music"}
+        >
+          {isAudioPlaying ? "❚❚" : "▶"}
+        </button>
+      </div>
+
       {/* Typing Box */}
       <div className="z-10 md:justify-center fixed mt-5 left-4 right-4 flex gap-3 flex-wrap justify-stretch px-4 md:px-8">
         <TypingBox />
