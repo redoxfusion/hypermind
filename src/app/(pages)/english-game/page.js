@@ -25,7 +25,7 @@ export default function EnglishGame() {
   const [resetMessage, setResetMessage] = useState(null);
   const [resetError, setResetError] = useState(null);
   const [resetLoading, setResetLoading] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(30); // 30 seconds timer
+  const [timeLeft, setTimeLeft] = useState(120); // 120 seconds timer
 
   useEffect(() => {
     async function fetchProgressAndWords() {
@@ -69,7 +69,7 @@ export default function EnglishGame() {
     if (!userId) return;
 
     setNextLoading(true);
-    setTimeLeft(30); // Reset timer for next word
+    setTimeLeft(120); // Reset timer for next word
 
     // Handle scoring: +10 for correct answers, -5 for timeout, 0 for incorrect manual submission
     const currentWord = words[current];
@@ -250,7 +250,7 @@ export default function EnglishGame() {
         <Link href="/">
           <IoArrowBack size={30} className="text-white" />
         </Link>
-        <h1 className="text-white text-lg">Category: Animals</h1>
+        <h1 className="text-white text-lg">Animals</h1>
         <div></div>
       </div>
       <div className="w-full px-4 flex items-center justify-center">

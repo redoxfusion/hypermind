@@ -24,7 +24,7 @@ export default function MathsGame() {
   const [resetMessage, setResetMessage] = useState(null);
   const [resetError, setResetError] = useState(null);
   const [resetLoading, setResetLoading] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(30); // 30 seconds timer
+  const [timeLeft, setTimeLeft] = useState(120); // 120 seconds timer
 
   useEffect(() => {
     async function fetchProgressAndProblems() {
@@ -68,7 +68,7 @@ export default function MathsGame() {
     if (!userId) return;
 
     setNextLoading(true);
-    setTimeLeft(30); // Reset timer for next problem
+    setTimeLeft(120); // Reset timer for next problem
 
     // Handle scoring: +10 for correct answers, -5 for timeout, 0 for incorrect manual submission
     const currentProblem = problems[current];
@@ -251,7 +251,7 @@ export default function MathsGame() {
         <Link href="/">
           <IoArrowBack size={30} className="text-white" />
         </Link>
-        <h1 className="text-white text-lg">Category: Maths</h1>
+        <h1 className="text-white text-lg">Maths</h1>
         <div></div>
       </div>
       <div className="w-full px-4 flex items-center justify-center">
