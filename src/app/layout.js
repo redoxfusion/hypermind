@@ -26,7 +26,7 @@ export default function DashboardLayout({ children }) {
           <title>{metadata.title}</title>
         </head>
         <body>
-          <div className="flex flex-col min-h-screen bg-indigo-600">
+          <div className="flex flex-col min-h-screen bg-gradient-to-b from-blue-400 to-green-500">
           <NextTopLoader color="#ffffff" />
             {children}
             <BottomNavBar />

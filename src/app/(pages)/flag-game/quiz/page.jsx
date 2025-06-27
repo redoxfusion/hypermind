@@ -7,6 +7,9 @@ import { IoArrowBack } from "react-icons/io5";
 import { RedirectToSignIn, useAuth } from "@clerk/nextjs";
 import { ClipLoader } from "react-spinners";
 import { useRouter } from "nextjs-toploader/app";
+import Confetti from "react-confetti";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function FlagsGameQuiz() {
   const { userId } = useAuth();
@@ -24,6 +27,21 @@ export default function FlagsGameQuiz() {
   const [resetError, setResetError] = useState(null);
   const [resetLoading, setResetLoading] = useState(false);
   const [timeLeft, setTimeLeft] = useState(120);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [windowDimensions, setWindowDimensions] = useState({ width: 0, height: 0 });
+
+  // Update window dimensions on mount and resize
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowDimensions({
+        width: window.innerWidth,
+        height: window.innerHeight + 1000,
+      });
+    };
+    handleResize(); // Set initial dimensions
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     async function fetchProgressAndFlags() {
@@ -61,8 +79,8 @@ export default function FlagsGameQuiz() {
       setLoading(true);
       const currentFlag = flags[current];
 
-      // Generate available letters (all unique letters from the answer)
-      const answerLetters = currentFlag.answer.split("");
+      // Generate available letters (all unique letters from the answer, ignoring spaces)
+      const answerLetters = currentFlag.answer.replace(/\s/g, "").split("");
       const uniqueLetters = [...new Set(answerLetters)];
       setAvailableLetters(shuffle(uniqueLetters));
 
@@ -115,7 +133,7 @@ export default function FlagsGameQuiz() {
     setTimeLeft(120);
 
     const currentFlag = flags[current];
-    const isCorrect = selectedLetters.join("") === currentFlag.answer;
+    const isCorrect = selectedLetters.join("") === currentFlag.answer.replace(/\s/g, "");
     let levelScore = 0;
 
     if (isTimeout) {
@@ -126,6 +144,17 @@ export default function FlagsGameQuiz() {
       levelScore = 10;
       setScore(score + levelScore);
       setTotalScore(totalScore + levelScore);
+      setShowConfetti(true); // Trigger confetti for correct answer
+      setTimeout(() => setShowConfetti(false), 7000); // Hide after 7 seconds
+    } else {
+      toast.error("Incorrect answer! Try again.", {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      }); // Show toast for wrong answer
     }
 
     try {
@@ -182,7 +211,7 @@ export default function FlagsGameQuiz() {
   }, [timeLeft, current, flags.length, handleNext]);
 
   const handleLetterClick = (letter) => {
-    if (selectedLetters.length < flags[current].answer.length) {
+    if (selectedLetters.length < flags[current].answer.replace(/\s/g, "").length) {
       setSelectedLetters([...selectedLetters, letter]);
     }
   };
@@ -237,38 +266,8 @@ export default function FlagsGameQuiz() {
 
   if (!userId) return <RedirectToSignIn />;
 
-  if (loading)
-    return (
-      <div className="min-h-screen flex items-center justify-center mt-20 text-white">
-        <ClipLoader loading={loading} size={80} color="#fff" aria-label="Loading Spinner" data-testid="loader" />
-      </div>
-    );
-
-  if (!loading && flags.length === 0)
-    return (
-      <div className="min-h-screen text-center mt-20 text-white">
-        <h2>Game Over!</h2>
-        <p>Your Total Score: {totalScore}</p>
-        <p>Level Achieved: {level - 1}</p>
-        <button
-          onClick={handleResetProgress}
-          className="bg-red-600 text-white font-bold rounded-full px-12 py-3 text-lg hover:bg-red-700 cursor-pointer mt-4"
-        >
-          {resetLoading ? (
-            <ClipLoader loading={resetLoading} size={20} aria-label="Loading Spinner" data-testid="loader" />
-          ) : (
-            "Play Again"
-          )}
-        </button>
-      </div>
-    );
-
-  const currentFlag = flags[current];
-  const formattedAnswer = currentFlag.answer.replace(/([A-Z])([A-Z]+)/g, '$1 $2').toLowerCase();
-  const selectedWord = selectedLetters.join("");
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-400 to-green-500 flex flex-col items-center justify-between py-8">
+    <div className="min-h-screen bg-gradient-to-b from-blue-400 to-green-500 flex flex-col items-center justify-between py-8 relative">
       <div className="w-full px-4 flex items-center justify-between">
         <Link href="/flag-game">
           <IoArrowBack size={30} className="text-white" />
@@ -276,75 +275,134 @@ export default function FlagsGameQuiz() {
         <h1 className="text-white text-lg">Flags (Quiz Mode)</h1>
         <div></div>
       </div>
-      <div className="w-full px-4 flex items-center justify-center">
-        <div className="text-white text-lg min-w-fit">
-          Level: {level} | Score: {totalScore} | Time: {timeLeft}s
+      {loading ? (
+        <div className="min-h-screen flex items-center justify-center mt-20 text-white">
+          <ClipLoader loading={loading} size={80} color="#fff" aria-label="Loading Spinner" data-testid="loader" />
         </div>
-      </div>
-      <div className="flex flex-col items-center">
-        <Image
-          src={currentFlag.image}
-          alt="Flag Image"
-          width={200}
-          height={200}
-          className="mb-4"
-        />
-        <p className="text-white text-base mb-4 px-3 text-center">{hint}</p>
-        <div className="text-white text-2xl mb-4">
-          {selectedWord.split("").map((letter, index) => (
-            <span key={index} className="mx-1">{letter}</span>
-          ))}
-          {Array.from({ length: currentFlag.answer.length - selectedLetters.length }).map((_, index) => (
-            <span key={index} className="mx-1">_</span>
-          ))}
-        </div>
-        <div className="grid grid-cols-6 gap-2 mb-4 place-items-center mx-auto">
-          {availableLetters.map((letter, index) => (
-            <button
-              key={index}
-              onClick={() => handleLetterClick(letter)}
-              className="bg-white text-black font-bold rounded-full px-4 py-2 hover:bg-gray-200 cursor-pointer"
-              disabled={selectedLetters.length >= currentFlag.answer.length}
-            >
-              {letter}
-            </button>
-          ))}
-        </div>
-        <button
-          onClick={handleRemoveLetter}
-          className="bg-red-600 text-white font-bold rounded-full px-6 py-2 hover:bg-red-700 cursor-pointer"
-          disabled={selectedLetters.length === 0}
-        >
-          Remove
-        </button>
-      </div>
-      <div className="w-full flex flex-col items-center gap-4 px-6">
-        <button
-          onClick={() => handleNext(false)}
-          className="bg-white text-black font-bold rounded-full mt-3 px-12 py-3 text-lg disabled:opacity-50 cursor-pointer"
-          disabled={nextLoading || selectedLetters.length !== currentFlag.answer.length}
-        >
-          {!nextLoading ? (
-            "SUBMIT"
-          ) : (
-            <ClipLoader loading={nextLoading} size={20} aria-label="Loading Spinner" data-testid="loader" />
-          )}
-        </button>
-        {level > 1 && (
+      ) : flags.length === 0 ? (
+        <div className="min-h-screen text-center mt-20 text-white">
+          <h2>Game Over!</h2>
+          <p>Your Total Score: {totalScore}</p>
+          <p>Level Achieved: {level - 1}</p>
           <button
             onClick={handleResetProgress}
-            className="bg-red-600 text-white font-bold rounded-full px-12 py-3 text-lg hover:bg-red-700 cursor-pointer"
+            className="bg-red-600 text-white font-bold rounded-full px-12 py-3 text-lg hover:bg-red-700 cursor-pointer mt-4"
           >
             {resetLoading ? (
               <ClipLoader loading={resetLoading} size={20} aria-label="Loading Spinner" data-testid="loader" />
             ) : (
-              "Reset Progress"
+              "Play Again"
             )}
           </button>
-        )}
-        {resetMessage && <p className="text-green-400 text-center">{resetMessage}</p>}
-        {resetError && <p className="text-red-400 text-center">{resetError}</p>}
-      </div>
+        </div>
+      ) : (
+        <div>
+          <div className="w-full px-4 flex items-center justify-center">
+            <div className="text-white text-lg min-w-fit">
+              Level: {level} | Score: {totalScore} | Time: {timeLeft}s
+            </div>
+          </div>
+          <div className="flex flex-col items-center">
+            <Image
+              src={flags[current].image}
+              alt="Flag Image"
+              width={200}
+              height={200}
+              className="mb-4"
+            />
+            <p className="text-white text-base mb-4 px-3 text-center">{hint}</p>
+            <div className="flex flex-col items-center mb-4">
+              {flags[current].answer.split(" ").map((word, wordIndex) => (
+                <div key={wordIndex} className="text-white text-2xl mb-2">
+                  {selectedLetters.slice(
+                    flags[current].answer
+                      .split(" ")
+                      .slice(0, wordIndex)
+                      .join(" ")
+                      .length,
+                    flags[current].answer
+                      .split(" ")
+                      .slice(0, wordIndex + 1)
+                      .join(" ")
+                      .length
+                  ).map((letter, index) => (
+                    <span key={index} className="mx-1">{letter}</span>
+                  ))}
+                  {Array.from({ length: word.length - (selectedLetters.length > flags[current].answer
+                    .split(" ")
+                    .slice(0, wordIndex)
+                    .join(" ")
+                    .length
+                    ? Math.min(word.length, selectedLetters.length - flags[current].answer
+                      .split(" ")
+                      .slice(0, wordIndex)
+                      .join(" ")
+                      .length)
+                    : 0) }).map((_, index) => (
+                    <span key={index} className="mx-1">_</span>
+                  ))}
+                </div>
+              ))}
+            </div>
+            <div className="grid grid-cols-6 gap-2 mb-4 place-items-center mx-auto">
+              {availableLetters.map((letter, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleLetterClick(letter)}
+                  className="bg-white text-black font-bold rounded-full px-4 py-2 hover:bg-gray-200 cursor-pointer"
+                  disabled={selectedLetters.length >= flags[current].answer.replace(/\s/g, "").length}
+                >
+                  {letter}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={handleRemoveLetter}
+              className="bg-red-600 text-white font-bold rounded-full px-6 py-2 hover:bg-red-700 cursor-pointer"
+              disabled={selectedLetters.length === 0}
+            >
+              Remove
+            </button>
+          </div>
+          <div className="w-full flex flex-col items-center gap-4 px-6">
+            <button
+              onClick={() => handleNext(false)}
+              className="bg-white text-black font-bold rounded-full mt-3 px-12 py-3 text-lg disabled:opacity-50 cursor-pointer"
+              disabled={nextLoading || selectedLetters.length !== flags[current].answer.replace(/\s/g, "").length}
+            >
+              {!nextLoading ? (
+                "SUBMIT"
+              ) : (
+                <ClipLoader loading={nextLoading} size={20} aria-label="Loading Spinner" data-testid="loader" />
+              )}
+            </button>
+            {level > 1 && (
+              <button
+                onClick={handleResetProgress}
+                className="bg-red-600 text-white font-bold rounded-full px-12 py-3 text-lg hover:bg-red-700 cursor-pointer"
+              >
+                {resetLoading ? (
+                  <ClipLoader loading={resetLoading} size={20} aria-label="Loading Spinner" data-testid="loader" />
+                ) : (
+                  "Reset Progress"
+                )}
+              </button>
+            )}
+            {resetMessage && <p className="text-green-400 text-center">{resetMessage}</p>}
+            {resetError && <p className="text-red-400 text-center">{resetError}</p>}
+          </div>
+        </div>
+      )}
+      {showConfetti && (
+        <Confetti
+          width={windowDimensions.width}
+          height={windowDimensions.height}
+          recycle={false}
+          numberOfPieces={200}
+          gravity={0.1}
+        />
+      )}
+      <ToastContainer />
     </div>
   );
 }

@@ -6,7 +6,7 @@ import Link from "next/link";
 import { IoArrowBack } from "react-icons/io5";
 import { RedirectToSignIn, useAuth } from "@clerk/nextjs";
 import { ClipLoader } from "react-spinners";
-import { useRouter } from "nextjs-toploader/app";
+import Confetti from "react-confetti"; // Import react-confetti
 
 export default function FlagsGameMCQ() {
   const { userId } = useAuth();
@@ -23,6 +23,24 @@ export default function FlagsGameMCQ() {
   const [resetError, setResetError] = useState(null);
   const [resetLoading, setResetLoading] = useState(false);
   const [timeLeft, setTimeLeft] = useState(120);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [windowDimensions, setWindowDimensions] = useState({
+    width: 0,
+    height: 0,
+  });
+
+  // Update window dimensions on mount and resize
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowDimensions({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+    handleResize(); // Set initial dimensions
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     async function fetchProgressAndFlags() {
@@ -39,7 +57,9 @@ export default function FlagsGameMCQ() {
         const initialLevel = levelsPassed + 1;
         setLevel(initialLevel);
 
-        const flagsRes = await fetch(`/api/words?level=${initialLevel}&game=FlagsGameMCQ`);
+        const flagsRes = await fetch(
+          `/api/words?level=${initialLevel}&game=FlagsGameMCQ`
+        );
         if (!flagsRes.ok) throw new Error("Failed to fetch flags");
         const data = await flagsRes.json();
         if (data.length === 0) return;
@@ -61,11 +81,13 @@ export default function FlagsGameMCQ() {
       const currentFlag = flags[current];
 
       // Set options from database with automatic spacing
-      setOptions(currentFlag.options.map(option =>
-        typeof option === 'string'
-          ? option.charAt(0).toUpperCase() + option.slice(1)
-          : option
-      ));
+      setOptions(
+        currentFlag.options.map((option) =>
+          typeof option === "string"
+            ? option.charAt(0).toUpperCase() + option.slice(1)
+            : option
+        )
+      );
 
       try {
         const hintRes = await fetch(
@@ -101,66 +123,77 @@ export default function FlagsGameMCQ() {
     fetchTotalScore();
   }, [userId]);
 
-  const handleNext = useCallback(async (isTimeout = false) => {
-    if (!userId) return;
+  const handleNext = useCallback(
+    async (isTimeout = false) => {
+      if (!userId) return;
 
-    setNextLoading(true);
-    setTimeLeft(120);
+      setNextLoading(true);
+      setTimeLeft(120);
 
-    const currentFlag = flags[current];
-    const isCorrect = selectedOption === currentFlag.answer;
-    let levelScore = 0;
+      const currentFlag = flags[current];
+      const isCorrect = selectedOption === currentFlag.answer;
+      let levelScore = 0;
 
-    if (isTimeout) {
-      levelScore = Math.max(0, totalScore + levelScore);
-      setTotalScore(Math.max(0, totalScore + levelScore));
-    } else if (isCorrect) {
-      levelScore = 10;
-      setTotalScore(totalScore + levelScore);
-    }
-
-    try {
-      await fetch("/api/scores", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ level, score: levelScore, game: "FlagsGameMCQ" }),
-      });
-      await fetch("/api/user-progress", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ levelsPassed: level, game: "FlagsGameMCQ" }),
-      });
-    } catch (error) {
-      console.error("Error saving data:", error);
-    }
-
-    setSelectedOption(null);
-    const nextIndex = current + 1;
-    if (nextIndex < flags.length) {
-      setCurrent(nextIndex);
-      setNextLoading(false);
-    } else {
-      setLevel((prev) => prev + 1);
-      setCurrent(0);
-      setFlags([]);
-      setLoading(true);
-      try {
-        const flagsRes = await fetch(`/api/words?level=${level + 1}&game=FlagsGameMCQ`);
-        if (!flagsRes.ok) throw new Error("Failed to fetch flags");
-        const data = await flagsRes.json();
-        if (data.length === 0) {
-          setLoading(false);
-          return;
-        }
-        setFlags(data);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-        setNextLoading(false);
+      if (isTimeout) {
+        levelScore = Math.max(0, totalScore + levelScore);
+        setTotalScore(Math.max(0, totalScore + levelScore));
+      } else if (isCorrect) {
+        levelScore = 10;
+        setTotalScore(totalScore + levelScore);
+        setShowConfetti(true); // Trigger confetti for correct answer
+        setTimeout(() => setShowConfetti(false), 7000); // Hide after 2 seconds
       }
-    }
-  }, [userId, flags, current, selectedOption, totalScore, level]);
+
+      try {
+        await fetch("/api/scores", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            level,
+            score: levelScore,
+            game: "FlagsGameMCQ",
+          }),
+        });
+        await fetch("/api/user-progress", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ levelsPassed: level, game: "FlagsGameMCQ" }),
+        });
+      } catch (error) {
+        console.error("Error saving data:", error);
+      }
+
+      setSelectedOption(null);
+      const nextIndex = current + 1;
+      if (nextIndex < flags.length) {
+        setCurrent(nextIndex);
+        setNextLoading(false);
+      } else {
+        setLevel((prev) => prev + 1);
+        setCurrent(0);
+        setFlags([]);
+        setLoading(true);
+        try {
+          const flagsRes = await fetch(
+            `/api/words?level=${level + 1}&game=FlagsGameMCQ`
+          );
+          if (!flagsRes.ok) throw new Error("Failed to fetch flags");
+          const data = await flagsRes.json();
+          if (data.length === 0) {
+            setLoading(false);
+            return;
+          }
+          setFlags(data);
+        } catch (error) {
+          console.error(error);
+        } finally {
+          setLoading(false);
+          setNextLoading(false);
+        }
+      }
+    },
+    [userId, flags, current, selectedOption, totalScore, level]
+  );
 
   useEffect(() => {
     if (timeLeft > 0 && current < flags.length) {
@@ -180,7 +213,11 @@ export default function FlagsGameMCQ() {
     setResetLoading(true);
     if (!userId) return;
 
-    if (!window.confirm("Are you sure you want to reset your progress for MCQ mode?")) {
+    if (
+      !window.confirm(
+        "Are you sure you want to reset your progress for MCQ mode?"
+      )
+    ) {
       setResetLoading(false);
       return;
     }
@@ -192,7 +229,8 @@ export default function FlagsGameMCQ() {
         body: JSON.stringify({ game: "FlagsGameMCQ" }),
       });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Failed to reset progress");
+      if (!response.ok)
+        throw new Error(data.error || "Failed to reset progress");
       setResetMessage(data.message);
       setResetError(null);
       setLevel(1);
@@ -221,36 +259,10 @@ export default function FlagsGameMCQ() {
 
   if (!userId) return <RedirectToSignIn />;
 
-  if (loading)
-    return (
-      <div className="min-h-screen flex items-center justify-center mt-20 text-white">
-        <ClipLoader loading={loading} size={80} color="#fff" aria-label="Loading Spinner" data-testid="loader" />
-      </div>
-    );
-
-  if (!loading && flags.length === 0)
-    return (
-      <div className="min-h-screen text-center mt-20 text-white">
-        <h2>Game Over!</h2>
-        <p>Your Total Score: {totalScore}</p>
-        <p>Level Achieved: {level - 1}</p>
-        <button
-          onClick={handleResetProgress}
-          className="bg-red-600 text-white font-bold rounded-full px-12 py-3 text-lg hover:bg-red-700 cursor-pointer mt-4"
-        >
-          {resetLoading ? (
-            <ClipLoader loading={resetLoading} size={20} aria-label="Loading Spinner" data-testid="loader" />
-          ) : (
-            "Play Again"
-          )}
-        </button>
-      </div>
-    );
-
   const currentFlag = flags[current];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-400 to-green-500 flex flex-col items-center justify-between py-8">
+    <div className="min-h-screen bg-gradient-to-b from-blue-400 to-green-500 flex flex-col items-center justify-between py-8 relative">
       <div className="w-full px-4 flex items-center justify-between">
         <Link href="/flag-game">
           <IoArrowBack size={30} className="text-white" />
@@ -258,62 +270,139 @@ export default function FlagsGameMCQ() {
         <h1 className="text-white text-lg">Flags (MCQ Mode)</h1>
         <div></div>
       </div>
-      <div className="w-full px-4 flex items-center justify-center">
-        <div className="text-white text-lg min-w-fit">
-          Level: {level} | Score: {totalScore} | Time: {timeLeft}s
-        </div>
-      </div>
-      <div className="flex flex-col items-center">
-        <Image
-          src={currentFlag.image}
-          alt="Flag Image"
-          width={200}
-          height={200}
-          className="mb-4"
-        />
-        <p className="text-white text-lg mb-4 text-center">{hint}</p>
-        <div className="grid grid-cols-2 gap-2 bg-white p-3 mx-2 rounded-2xl max-w-md">
-          {options.map((option, index) => (
-            <button
-              key={index}
-              onClick={() => handleOptionClick(option)}
-              className={`font-bold text-gray-700 hover:bg-gray-200 p-1 rounded-lg text-center border-gray-300 ${
-                selectedOption === option ? "bg-blue-200" : ""
-              }`}
-              disabled={nextLoading}
-            >
-              {option}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className="w-full flex flex-col items-center gap-4 px-6">
-        <button
-          onClick={() => handleNext(false)}
-          className="bg-white text-black font-bold rounded-full mt-3 px-12 py-3 text-lg disabled:opacity-50 cursor-pointer"
-          disabled={nextLoading || !selectedOption}
-        >
-          {!nextLoading ? (
-            "SUBMIT"
-          ) : (
-            <ClipLoader loading={nextLoading} size={20} aria-label="Loading Spinner" data-testid="loader" />
-          )}
-        </button>
-        {level > 1 && (
+      {loading ? (
+        <>
+          <ClipLoader
+            loading={loading}
+            size={80}
+            color="#fff"
+            aria-label="Loading Spinner"
+            data-testid="loader"
+          />
+          <div></div>
+        </>
+      ) : flags.length === 0 ? (
+        <div>
+          <h2>Game Over!</h2>
+          <p>Your Total Score: {totalScore}</p>
+          <p>Level Achieved: {level - 1}</p>
           <button
             onClick={handleResetProgress}
-            className="bg-red-600 text-white font-bold rounded-full px-12 py-3 text-lg hover:bg-red-700 cursor-pointer"
+            className="bg-red-600 text-white font-bold rounded-full px-12 py-3 text-lg hover:bg-red-700 cursor-pointer mt-4"
           >
             {resetLoading ? (
-              <ClipLoader loading={resetLoading} size={20} aria-label="Loading Spinner" data-testid="loader" />
+              <ClipLoader
+                loading={resetLoading}
+                size={20}
+                aria-label="Loading Spinner"
+                data-testid="loader"
+              />
             ) : (
-              "Reset Progress"
+              "Play Again"
             )}
           </button>
-        )}
-        {resetMessage && <p className="text-green-400 text-center">{resetMessage}</p>}
-        {resetError && <p className="text-red-400 text-center">{resetError}</p>}
-      </div>
+        </div>
+      ) : (
+        <div>
+          <div className="w-full px-4 flex items-center justify-center">
+            <div className="text-white text-lg min-w-fit">
+              Level: {level} | Score: {totalScore} | Time: {timeLeft}s
+            </div>
+          </div>
+          <div className="flex flex-col items-center">
+            <Image
+              src={currentFlag.image}
+              alt="Flag Image"
+              width={200}
+              height={200}
+              className="mb-4"
+            />
+            <p className="text-white text-lg mb-4 text-center">{hint}</p>
+            <div className="grid grid-cols-2 gap-2 bg-white p-3 mx-2 rounded-2xl max-w-md">
+              {options.map((option, index) => {
+                let buttonClass = `font-bold text-gray-700 hover:bg-gray-200 p-1 rounded-lg text-center border-gray-300`;
+                if (nextLoading && selectedOption) {
+                  if (
+                    selectedOption === currentFlag.answer &&
+                    option === selectedOption
+                  ) {
+                    buttonClass += " bg-green-500 text-white";
+                  } else if (
+                    selectedOption !== currentFlag.answer &&
+                    option === selectedOption
+                  ) {
+                    buttonClass += " bg-red-500 text-white";
+                  } else if (option === currentFlag.answer) {
+                    buttonClass += " bg-green-500 text-white";
+                  }
+                } else if (selectedOption === option) {
+                  buttonClass += " bg-blue-200";
+                }
+                return (
+                  <button
+                    key={index}
+                    onClick={() => handleOptionClick(option)}
+                    className={buttonClass}
+                    disabled={nextLoading}
+                  >
+                    {option}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          <div className="w-full flex flex-col items-center gap-4 px-6">
+            <button
+              onClick={() => handleNext(false)}
+              className="bg-white text-black font-bold rounded-full mt-3 px-12 py-3 text-lg disabled:opacity-50 cursor-pointer"
+              disabled={nextLoading || !selectedOption}
+            >
+              {!nextLoading ? (
+                "SUBMIT"
+              ) : (
+                <ClipLoader
+                  loading={nextLoading}
+                  size={20}
+                  aria-label="Loading Spinner"
+                  data-testid="loader"
+                />
+              )}
+            </button>
+            {level > 1 && (
+              <button
+                onClick={handleResetProgress}
+                className="bg-red-600 text-white font-bold rounded-full px-12 py-3 text-lg hover:bg-red-700 cursor-pointer"
+              >
+                {resetLoading ? (
+                  <ClipLoader
+                    loading={resetLoading}
+                    size={20}
+                    aria-label="Loading Spinner"
+                    data-testid="loader"
+                  />
+                ) : (
+                  "Reset Progress"
+                )}
+              </button>
+            )}
+            {resetMessage && (
+              <p className="text-green-400 text-center">{resetMessage}</p>
+            )}
+            {resetError && (
+              <p className="text-red-400 text-center">{resetError}</p>
+            )}
+          </div>
+        </div>
+      )}
+      {showConfetti && (
+        <Confetti
+          width={windowDimensions.width}
+          height={windowDimensions.height + 1000}
+          recycle={false}
+          numberOfPieces={200}
+          gravity={0.1}
+        />
+      )}
     </div>
   );
 }
