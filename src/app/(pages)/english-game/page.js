@@ -6,11 +6,12 @@ import Link from "next/link";
 import {
   IoArrowBack,
   IoBackspaceOutline,
+  IoClose,
   IoTrashOutline,
 } from "react-icons/io5";
 import { RedirectToSignIn, useAuth } from "@clerk/nextjs";
 import { ClipLoader } from "react-spinners";
-import { useRouter } from "nextjs-toploader/app";
+import Confetti from "react-confetti";
 
 export default function EnglishGame() {
   const { userId } = useAuth();
@@ -20,12 +21,31 @@ export default function EnglishGame() {
   const [loading, setLoading] = useState(true);
   const [nextLoading, setNextLoading] = useState(false);
   const [level, setLevel] = useState(1);
-  const [score, setScore] = useState(0);
   const [totalScore, setTotalScore] = useState(0);
   const [resetMessage, setResetMessage] = useState(null);
   const [resetError, setResetError] = useState(null);
   const [resetLoading, setResetLoading] = useState(false);
   const [timeLeft, setTimeLeft] = useState(120); // 120 seconds timer
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [hint, setHint] = useState("");
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [windowDimensions, setWindowDimensions] = useState({
+    width: 0,
+    height: 0,
+  });
+
+  // Update window dimensions on mount and resize
+    useEffect(() => {
+      const handleResize = () => {
+        setWindowDimensions({
+          width: window.innerWidth,
+          height: window.innerHeight + 1000,
+        });
+      };
+      handleResize(); // Set initial dimensions
+      window.addEventListener("resize", handleResize);
+      return () => window.removeEventListener("resize", handleResize);
+    }, []);
 
   useEffect(() => {
     async function fetchProgressAndWords() {
@@ -65,71 +85,107 @@ export default function EnglishGame() {
     fetchProgressAndWords();
   }, [userId]);
 
-  const handleNext = useCallback(async (isTimeout = false) => {
-    if (!userId) return;
-
-    setNextLoading(true);
-    setTimeLeft(120); // Reset timer for next word
-
-    // Handle scoring: +10 for correct answers, -5 for timeout, 0 for incorrect manual submission
-    const currentWord = words[current];
-    const isCorrect = selectedLetters.join("") === currentWord.answer;
-    let levelScore = 0;
-
-    if (isTimeout) {
-      levelScore = -5; // Deduct 5 points for timeout
-      setScore(Math.max(0, score + levelScore));
-      setTotalScore(Math.max(0, totalScore + levelScore));
-    } else if (isCorrect) {
-      levelScore = 10; // Award 10 points for correct answer
-      setScore(score + levelScore);
-      setTotalScore(totalScore + levelScore);
-    }
-
-    try {
-      await fetch("/api/scores", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ level, score: levelScore, game: "EnglishGame" }),
-      });
-      await fetch("/api/user-progress", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ levelsPassed: level, game: "EnglishGame" }),
-      });
-    } catch (error) {
-      console.error("Error saving data:", error);
-    }
-
-    setSelectedLetters([]);
-    const nextIndex = current + 1;
-    if (nextIndex < words.length) {
-      setCurrent(nextIndex);
-      setNextLoading(false);
-    } else {
-      setLevel((prev) => prev + 1);
-      setCurrent(0);
-      setWords([]);
+  useEffect(() => {
+    async function fetchHint() {
+      if (words.length === 0 || current >= words.length) return;
       setLoading(true);
+      const currentWord = words[current];
+
       try {
-        const wordsRes = await fetch(
-          `/api/words?level=${level + 1}&game=EnglishGame`
+        const hintRes = await fetch(
+          `/api/ai?speech=formal&question=Provide a short hint (1-2 sentences) about the animal ${currentWord.answer} for a Animal word quiz game focusing on a unique characteristic or behavior.`
         );
-        if (!wordsRes.ok) throw new Error("Failed to fetch words");
-        const data = await wordsRes.json();
-        if (data.length === 0) {
-          setLoading(false);
-          return;
-        }
-        setWords(data);
+        if (!hintRes.ok) throw new Error("Failed to fetch hint");
+        const hintData = await hintRes.json();
+        setHint(hintData.response || "No hint available.");
       } catch (error) {
-        console.error(error);
+        console.error("Error fetching hint:", error);
+        setHint("No hint available due to an error.");
       } finally {
         setLoading(false);
-        setNextLoading(false);
       }
     }
-  }, [userId, words, current, selectedLetters, score, totalScore, level]);
+
+    fetchHint();
+  }, [current, words]);
+
+  const handleNext = useCallback(
+    async (isTimeout = false) => {
+      if (!userId) return;
+
+      setNextLoading(true);
+      setTimeLeft(120); // Reset timer for next word
+
+      // Handle scoring: +10 for correct answers, -5 for timeout, 0 for incorrect manual submission
+      const currentWord = words[current];
+      const isCorrect = selectedLetters.join("") === currentWord.answer;
+      let levelScore = 0;
+
+      if (isTimeout) {
+        levelScore = -5; // Deduct 5 points for timeout
+        setTotalScore(Math.max(0, totalScore + levelScore));
+      } else if (isCorrect) {
+        levelScore = 10; // Award 10 points for correct answer
+        setTotalScore(totalScore + levelScore);
+        setShowConfetti(true); // Trigger confetti for correct answer
+        setTimeout(() => setShowConfetti(false), 7000); // Hide after 7 seconds
+      } else {
+        setShowErrorModal(true); // Show custom error modal
+        setTimeLeft(120); // Reset timer on incorrect answer
+        setNextLoading(false);
+        return; // Prevent moving to next question
+      }
+
+      try {
+        await fetch("/api/scores", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            level,
+            score: totalScore,
+            game: "EnglishGame",
+          }),
+        });
+        await fetch("/api/user-progress", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ levelsPassed: level, game: "EnglishGame" }),
+        });
+      } catch (error) {
+        console.error("Error saving data:", error);
+      }
+
+      setSelectedLetters([]);
+      const nextIndex = current + 1;
+      if (nextIndex < words.length) {
+        setCurrent(nextIndex);
+        setNextLoading(false);
+      } else {
+        setLevel((prev) => prev + 1);
+        setCurrent(0);
+        setWords([]);
+        setLoading(true);
+        try {
+          const wordsRes = await fetch(
+            `/api/words?level=${level + 1}&game=EnglishGame`
+          );
+          if (!wordsRes.ok) throw new Error("Failed to fetch words");
+          const data = await wordsRes.json();
+          if (data.length === 0) {
+            setLoading(false);
+            return;
+          }
+          setWords(data);
+        } catch (error) {
+          console.error(error);
+        } finally {
+          setLoading(false);
+          setNextLoading(false);
+        }
+      }
+    },
+    [userId, words, current, selectedLetters, totalScore, level]
+  );
 
   useEffect(() => {
     if (timeLeft > 0 && current < words.length) {
@@ -178,7 +234,6 @@ export default function EnglishGame() {
       setResetMessage(data.message);
       setResetError(null);
       setLevel(1);
-      setScore(0);
       setTotalScore(0);
       setCurrent(0);
       setSelectedLetters([]);
@@ -200,6 +255,10 @@ export default function EnglishGame() {
       setLoading(false);
       setResetLoading(false);
     }
+  };
+
+  const handleCloseErrorModal = () => {
+    setShowErrorModal(false);
   };
 
   if (!userId) return <RedirectToSignIn />;
@@ -268,6 +327,10 @@ export default function EnglishGame() {
           className="mb-4"
         />
 
+        <p className="text-white text-base mb-4 px-3 text-center">
+          Hint: {hint}
+        </p>
+
         <div className="flex gap-4 bg-white rounded-2xl px-8 py-4 mb-2">
           {currentWord.answer.split("").map((char, index) => (
             <div
@@ -314,7 +377,9 @@ export default function EnglishGame() {
         <button
           onClick={() => handleNext(false)}
           className="bg-white text-black font-bold rounded-full mt-3 px-12 py-3 text-lg disabled:opacity-50 cursor-pointer"
-          disabled={nextLoading}
+          disabled={
+            nextLoading || selectedLetters.length !== currentWord.answer.length
+          }
         >
           {!nextLoading ? (
             "NEXT"
@@ -349,6 +414,40 @@ export default function EnglishGame() {
           <p className="text-green-400 text-center">{resetMessage}</p>
         )}
         {resetError && <p className="text-red-400 text-center">{resetError}</p>}
+        {showConfetti && (
+          <Confetti
+            width={windowDimensions.width}
+            height={windowDimensions.height}
+            recycle={false}
+            numberOfPieces={200}
+            gravity={0.1}
+          />
+        )}
+        {showErrorModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-gradient-to-br from-red-500 to-pink-600 p-6 rounded-lg shadow-lg text-white animate-fade-in">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-bold">Incorrect Answer!</h2>
+                <button
+                  onClick={handleCloseErrorModal}
+                  className="text-white hover:text-gray-200"
+                >
+                  <IoClose size={24} />
+                </button>
+              </div>
+              <p className="mb-4">
+                Your answer was incorrect. Please try again with the hint
+                provided.
+              </p>
+              <button
+                onClick={handleCloseErrorModal}
+                className="bg-white text-red-600 font-bold py-2 px-4 rounded-full hover:bg-gray-200 transition duration-200"
+              >
+                Try Again
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

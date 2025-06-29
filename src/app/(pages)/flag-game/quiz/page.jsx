@@ -3,13 +3,11 @@
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { IoArrowBack } from "react-icons/io5";
+import { IoArrowBack, IoClose } from "react-icons/io5";
 import { RedirectToSignIn, useAuth } from "@clerk/nextjs";
 import { ClipLoader } from "react-spinners";
 import { useRouter } from "nextjs-toploader/app";
 import Confetti from "react-confetti";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 export default function FlagsGameQuiz() {
   const { userId } = useAuth();
@@ -21,14 +19,17 @@ export default function FlagsGameQuiz() {
   const [loading, setLoading] = useState(true);
   const [nextLoading, setNextLoading] = useState(false);
   const [level, setLevel] = useState(1);
-  const [score, setScore] = useState(0);
   const [totalScore, setTotalScore] = useState(0);
   const [resetMessage, setResetMessage] = useState(null);
   const [resetError, setResetError] = useState(null);
   const [resetLoading, setResetLoading] = useState(false);
   const [timeLeft, setTimeLeft] = useState(120);
   const [showConfetti, setShowConfetti] = useState(false);
-  const [windowDimensions, setWindowDimensions] = useState({ width: 0, height: 0 });
+  const [windowDimensions, setWindowDimensions] = useState({
+    width: 0,
+    height: 0,
+  });
+  const [showErrorModal, setShowErrorModal] = useState(false);
 
   // Update window dimensions on mount and resize
   useEffect(() => {
@@ -52,13 +53,17 @@ export default function FlagsGameQuiz() {
       setLoading(true);
 
       try {
-        const progressRes = await fetch("/api/user-progress?game=FlagsGameQuiz");
+        const progressRes = await fetch(
+          "/api/user-progress?game=FlagsGameQuiz"
+        );
         if (!progressRes.ok) throw new Error("Failed to fetch progress");
         const { levelsPassed } = await progressRes.json();
         const initialLevel = levelsPassed + 1;
         setLevel(initialLevel);
 
-        const flagsRes = await fetch(`/api/words?level=${initialLevel}&game=FlagsGameQuiz`);
+        const flagsRes = await fetch(
+          `/api/words?level=${initialLevel}&game=FlagsGameQuiz`
+        );
         if (!flagsRes.ok) throw new Error("Failed to fetch flags");
         const data = await flagsRes.json();
         if (data.length === 0) return;
@@ -79,7 +84,7 @@ export default function FlagsGameQuiz() {
       setLoading(true);
       const currentFlag = flags[current];
 
-      // Generate available letters (all unique letters from the answer, ignoring spaces)
+      // Generate available letters (all unique letters from the answer, ignoring spaces for selection)
       const answerLetters = currentFlag.answer.replace(/\s/g, "").split("");
       const uniqueLetters = [...new Set(answerLetters)];
       setAvailableLetters(shuffle(uniqueLetters));
@@ -126,79 +131,83 @@ export default function FlagsGameQuiz() {
     fetchTotalScore();
   }, [userId]);
 
-  const handleNext = useCallback(async (isTimeout = false) => {
-    if (!userId) return;
+  const handleNext = useCallback(
+    async (isTimeout = false) => {
+      if (!userId) return;
 
-    setNextLoading(true);
-    setTimeLeft(120);
+      setNextLoading(true);
+      setTimeLeft(120);
 
-    const currentFlag = flags[current];
-    const isCorrect = selectedLetters.join("") === currentFlag.answer.replace(/\s/g, "");
-    let levelScore = 0;
+      const currentFlag = flags[current];
+      const isCorrect =
+        selectedLetters.join("") === currentFlag.answer.replace(/\s/g, "");
+      let levelScore = 0;
 
-    if (isTimeout) {
-      levelScore = -5;
-      setScore(Math.max(0, score + levelScore));
-      setTotalScore(Math.max(0, totalScore + levelScore));
-    } else if (isCorrect) {
-      levelScore = 10;
-      setScore(score + levelScore);
-      setTotalScore(totalScore + levelScore);
-      setShowConfetti(true); // Trigger confetti for correct answer
-      setTimeout(() => setShowConfetti(false), 7000); // Hide after 7 seconds
-    } else {
-      toast.error("Incorrect answer! Try again.", {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      }); // Show toast for wrong answer
-    }
-
-    try {
-      await fetch("/api/scores", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ level, score: levelScore, game: "FlagsGameQuiz" }),
-      });
-      await fetch("/api/user-progress", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ levelsPassed: level, game: "FlagsGameQuiz" }),
-      });
-    } catch (error) {
-      console.error("Error saving data:", error);
-    }
-
-    setSelectedLetters([]);
-    const nextIndex = current + 1;
-    if (nextIndex < flags.length) {
-      setCurrent(nextIndex);
-      setNextLoading(false);
-    } else {
-      setLevel((prev) => prev + 1);
-      setCurrent(0);
-      setFlags([]);
-      setLoading(true);
-      try {
-        const flagsRes = await fetch(`/api/words?level=${level + 1}&game=FlagsGameQuiz`);
-        if (!flagsRes.ok) throw new Error("Failed to fetch flags");
-        const data = await flagsRes.json();
-        if (data.length === 0) {
-          setLoading(false);
-          return;
-        }
-        setFlags(data);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
+      if (isTimeout) {
+        levelScore = -5;
+        setTotalScore(Math.max(0, totalScore + levelScore));
+      } else if (isCorrect) {
+        levelScore = 10;
+        setTotalScore(totalScore + levelScore);
+        setShowConfetti(true); // Trigger confetti for correct answer
+        setTimeout(() => setShowConfetti(false), 7000); // Hide after 7 seconds
+      } else {
+        setShowErrorModal(true); // Show custom error modal
+        setTimeLeft(120); // Reset timer on incorrect answer
         setNextLoading(false);
+        return; // Prevent moving to next question
       }
-    }
-  }, [userId, flags, current, selectedLetters, score, totalScore, level]);
+
+      try {
+        await fetch("/api/scores", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            level,
+            score: totalScore,
+            game: "FlagsGameQuiz",
+          }),
+        });
+        await fetch("/api/user-progress", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ levelsPassed: level, game: "FlagsGameQuiz" }),
+        });
+      } catch (error) {
+        console.error("Error saving data:", error);
+      }
+
+      setSelectedLetters([]);
+      const nextIndex = current + 1;
+      if (nextIndex < flags.length) {
+        setCurrent(nextIndex);
+        setNextLoading(false);
+      } else {
+        setLevel((prev) => prev + 1);
+        setCurrent(0);
+        setFlags([]);
+        setLoading(true);
+        try {
+          const flagsRes = await fetch(
+            `/api/words?level=${level + 1}&game=FlagsGameQuiz`
+          );
+          if (!flagsRes.ok) throw new Error("Failed to fetch flags");
+          const data = await flagsRes.json();
+          if (data.length === 0) {
+            setLoading(false);
+            return;
+          }
+          setFlags(data);
+        } catch (error) {
+          console.error(error);
+        } finally {
+          setLoading(false);
+          setNextLoading(false);
+        }
+      }
+    },
+    [userId, flags, current, selectedLetters, totalScore, level]
+  );
 
   useEffect(() => {
     if (timeLeft > 0 && current < flags.length) {
@@ -211,7 +220,9 @@ export default function FlagsGameQuiz() {
   }, [timeLeft, current, flags.length, handleNext]);
 
   const handleLetterClick = (letter) => {
-    if (selectedLetters.length < flags[current].answer.replace(/\s/g, "").length) {
+    if (
+      selectedLetters.length < flags[current].answer.replace(/\s/g, "").length
+    ) {
       setSelectedLetters([...selectedLetters, letter]);
     }
   };
@@ -224,7 +235,11 @@ export default function FlagsGameQuiz() {
     setResetLoading(true);
     if (!userId) return;
 
-    if (!window.confirm("Are you sure you want to reset your progress for Quiz mode?")) {
+    if (
+      !window.confirm(
+        "Are you sure you want to reset your progress for Quiz mode?"
+      )
+    ) {
       setResetLoading(false);
       return;
     }
@@ -236,11 +251,11 @@ export default function FlagsGameQuiz() {
         body: JSON.stringify({ game: "FlagsGameQuiz" }),
       });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Failed to reset progress");
+      if (!response.ok)
+        throw new Error(data.error || "Failed to reset progress");
       setResetMessage(data.message);
       setResetError(null);
       setLevel(1);
-      setScore(0);
       setTotalScore(0);
       setCurrent(0);
       setSelectedLetters([]);
@@ -264,8 +279,14 @@ export default function FlagsGameQuiz() {
     }
   };
 
+  const handleCloseErrorModal = () => {
+    setShowErrorModal(false);
+  };
+
   if (!userId) return <RedirectToSignIn />;
 
+  console.log("Word: ", flags[current]?.answer);
+  console.log("Selected Letters: ", selectedLetters);
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-400 to-green-500 flex flex-col items-center justify-between py-8 relative">
       <div className="w-full px-4 flex items-center justify-between">
@@ -277,7 +298,13 @@ export default function FlagsGameQuiz() {
       </div>
       {loading ? (
         <div className="min-h-screen flex items-center justify-center mt-20 text-white">
-          <ClipLoader loading={loading} size={80} color="#fff" aria-label="Loading Spinner" data-testid="loader" />
+          <ClipLoader
+            loading={loading}
+            size={80}
+            color="#fff"
+            aria-label="Loading Spinner"
+            data-testid="loader"
+          />
         </div>
       ) : flags.length === 0 ? (
         <div className="min-h-screen text-center mt-20 text-white">
@@ -289,7 +316,12 @@ export default function FlagsGameQuiz() {
             className="bg-red-600 text-white font-bold rounded-full px-12 py-3 text-lg hover:bg-red-700 cursor-pointer mt-4"
           >
             {resetLoading ? (
-              <ClipLoader loading={resetLoading} size={20} aria-label="Loading Spinner" data-testid="loader" />
+              <ClipLoader
+                loading={resetLoading}
+                size={20}
+                aria-label="Loading Spinner"
+                data-testid="loader"
+              />
             ) : (
               "Play Again"
             )}
@@ -312,37 +344,44 @@ export default function FlagsGameQuiz() {
             />
             <p className="text-white text-base mb-4 px-3 text-center">{hint}</p>
             <div className="flex flex-col items-center mb-4">
-              {flags[current].answer.split(" ").map((word, wordIndex) => (
-                <div key={wordIndex} className="text-white text-2xl mb-2">
-                  {selectedLetters.slice(
-                    flags[current].answer
-                      .split(" ")
-                      .slice(0, wordIndex)
-                      .join(" ")
-                      .length,
-                    flags[current].answer
-                      .split(" ")
-                      .slice(0, wordIndex + 1)
-                      .join(" ")
-                      .length
-                  ).map((letter, index) => (
-                    <span key={index} className="mx-1">{letter}</span>
-                  ))}
-                  {Array.from({ length: word.length - (selectedLetters.length > flags[current].answer
+              <div className="flex flex-col items-center mb-4">
+                {flags[current].answer.split(" ").map((word, wordIndex) => {
+                  // Calculate how many letters should be displayed for this word
+                  const wordsBeforeThis = flags[current].answer
                     .split(" ")
-                    .slice(0, wordIndex)
-                    .join(" ")
-                    .length
-                    ? Math.min(word.length, selectedLetters.length - flags[current].answer
-                      .split(" ")
-                      .slice(0, wordIndex)
-                      .join(" ")
-                      .length)
-                    : 0) }).map((_, index) => (
-                    <span key={index} className="mx-1">_</span>
-                  ))}
-                </div>
-              ))}
+                    .slice(0, wordIndex);
+                  const totalLettersBeforeThisWord = wordsBeforeThis.reduce(
+                    (sum, w) => sum + w.length,
+                    0
+                  );
+                  const lettersForThisWord = selectedLetters.slice(
+                    totalLettersBeforeThisWord,
+                    totalLettersBeforeThisWord + word.length
+                  );
+
+                  return (
+                    <div
+                      key={wordIndex}
+                      className="text-white text-2xl mb-2 flex"
+                    >
+                      {/* Render selected letters for this word */}
+                      {lettersForThisWord.map((letter, index) => (
+                        <span key={index} className="mx-1">
+                          {letter}
+                        </span>
+                      ))}
+                      {/* Render underscores for remaining letters in this word */}
+                      {Array.from({
+                        length: word.length - lettersForThisWord.length,
+                      }).map((_, index) => (
+                        <span key={index} className="mx-1">
+                          _
+                        </span>
+                      ))}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
             <div className="grid grid-cols-6 gap-2 mb-4 place-items-center mx-auto">
               {availableLetters.map((letter, index) => (
@@ -350,7 +389,9 @@ export default function FlagsGameQuiz() {
                   key={index}
                   onClick={() => handleLetterClick(letter)}
                   className="bg-white text-black font-bold rounded-full px-4 py-2 hover:bg-gray-200 cursor-pointer"
-                  disabled={selectedLetters.length >= flags[current].answer.replace(/\s/g, "").length}
+                  disabled={
+                    selectedLetters.length >= flags[current].answer.length
+                  }
                 >
                   {letter}
                 </button>
@@ -368,12 +409,21 @@ export default function FlagsGameQuiz() {
             <button
               onClick={() => handleNext(false)}
               className="bg-white text-black font-bold rounded-full mt-3 px-12 py-3 text-lg disabled:opacity-50 cursor-pointer"
-              disabled={nextLoading || selectedLetters.length !== flags[current].answer.replace(/\s/g, "").length}
+              disabled={
+                nextLoading ||
+                selectedLetters.length !==
+                  flags[current].answer.replace(/\s/g, "").length
+              }
             >
               {!nextLoading ? (
                 "SUBMIT"
               ) : (
-                <ClipLoader loading={nextLoading} size={20} aria-label="Loading Spinner" data-testid="loader" />
+                <ClipLoader
+                  loading={nextLoading}
+                  size={20}
+                  aria-label="Loading Spinner"
+                  data-testid="loader"
+                />
               )}
             </button>
             {level > 1 && (
@@ -382,14 +432,23 @@ export default function FlagsGameQuiz() {
                 className="bg-red-600 text-white font-bold rounded-full px-12 py-3 text-lg hover:bg-red-700 cursor-pointer"
               >
                 {resetLoading ? (
-                  <ClipLoader loading={resetLoading} size={20} aria-label="Loading Spinner" data-testid="loader" />
+                  <ClipLoader
+                    loading={resetLoading}
+                    size={20}
+                    aria-label="Loading Spinner"
+                    data-testid="loader"
+                  />
                 ) : (
                   "Reset Progress"
                 )}
               </button>
             )}
-            {resetMessage && <p className="text-green-400 text-center">{resetMessage}</p>}
-            {resetError && <p className="text-red-400 text-center">{resetError}</p>}
+            {resetMessage && (
+              <p className="text-green-400 text-center">{resetMessage}</p>
+            )}
+            {resetError && (
+              <p className="text-red-400 text-center">{resetError}</p>
+            )}
           </div>
         </div>
       )}
@@ -402,7 +461,31 @@ export default function FlagsGameQuiz() {
           gravity={0.1}
         />
       )}
-      <ToastContainer />
+      {showErrorModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-gradient-to-br from-red-500 to-pink-600 p-6 rounded-lg shadow-lg text-white animate-fade-in">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">Incorrect Answer!</h2>
+              <button
+                onClick={handleCloseErrorModal}
+                className="text-white hover:text-gray-200"
+              >
+                <IoClose size={24} />
+              </button>
+            </div>
+            <p className="mb-4">
+              Your answer was incorrect. Please try again with the hint
+              provided.
+            </p>
+            <button
+              onClick={handleCloseErrorModal}
+              className="bg-white text-red-600 font-bold py-2 px-4 rounded-full hover:bg-gray-200 transition duration-200"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
