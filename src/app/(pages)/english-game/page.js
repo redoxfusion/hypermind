@@ -35,17 +35,17 @@ export default function EnglishGame() {
   });
 
   // Update window dimensions on mount and resize
-    useEffect(() => {
-      const handleResize = () => {
-        setWindowDimensions({
-          width: window.innerWidth,
-          height: window.innerHeight + 1000,
-        });
-      };
-      handleResize(); // Set initial dimensions
-      window.addEventListener("resize", handleResize);
-      return () => window.removeEventListener("resize", handleResize);
-    }, []);
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowDimensions({
+        width: window.innerWidth,
+        height: window.innerHeight + 1000,
+      });
+    };
+    handleResize(); // Set initial dimensions
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     async function fetchProgressAndWords() {
@@ -121,17 +121,27 @@ export default function EnglishGame() {
       const isCorrect = selectedLetters.join("") === currentWord.answer;
       let levelScore = 0;
 
+      // Play audio based on outcome
+      const playAudio = (path) => {
+        const audio = new Audio(path);
+        audio
+          .play()
+          .catch((error) => console.error("Audio play error:", error));
+      };
+
       if (isTimeout) {
-        levelScore = -5; // Deduct 5 points for timeout
-        setTotalScore(Math.max(0, totalScore + levelScore));
+        levelScore = Math.max(0, totalScore - 5); // Deduct 5 points for timeout
+        setTotalScore(levelScore);
+        playAudio("/music/sfx/Fail.wav"); // Sad audio for timeout
       } else if (isCorrect) {
-        levelScore = 10; // Award 10 points for correct answer
-        setTotalScore(totalScore + levelScore);
+        levelScore = totalScore + 10; // Award 10 points for correct answer
+        setTotalScore(levelScore);
         setShowConfetti(true); // Trigger confetti for correct answer
+        playAudio("/music/sfx/Success.wav"); // Clapping audio for correct
         setTimeout(() => setShowConfetti(false), 7000); // Hide after 7 seconds
       } else {
         setShowErrorModal(true); // Show custom error modal
-        setTimeLeft(120); // Reset timer on incorrect answer
+        playAudio("/music/sfx/Fail.wav"); // Sad audio for incorrect
         setNextLoading(false);
         return; // Prevent moving to next question
       }
@@ -142,7 +152,7 @@ export default function EnglishGame() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             level,
-            score: totalScore,
+            score: levelScore,
             game: "EnglishGame",
           }),
         });
@@ -153,6 +163,8 @@ export default function EnglishGame() {
         });
       } catch (error) {
         console.error("Error saving data:", error);
+      } finally {
+        setTimeLeft(120); // Reset timer for next word
       }
 
       setSelectedLetters([]);
@@ -181,6 +193,7 @@ export default function EnglishGame() {
         } finally {
           setLoading(false);
           setNextLoading(false);
+          setTimeLeft(120); // Reset timer for next word
         }
       }
     },

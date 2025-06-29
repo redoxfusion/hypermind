@@ -143,18 +143,28 @@ export default function FlagsGameQuiz() {
         selectedLetters.join("") === currentFlag.answer.replace(/\s/g, "");
       let levelScore = 0;
 
+      // Play audio based on outcome
+      const playAudio = (path) => {
+        const audio = new Audio(path);
+        audio
+          .play()
+          .catch((error) => console.error("Audio play error:", error));
+      };
+
       if (isTimeout) {
-        levelScore = -5;
-        setTotalScore(Math.max(0, totalScore + levelScore));
+        levelScore = Math.max(0, totalScore - 5); // Deduct 5 points for timeout
+        setTotalScore(levelScore);
+        playAudio("/music/sfx/Fail.wav"); // Sad audio for timeout
       } else if (isCorrect) {
-        levelScore = 10;
-        setTotalScore(totalScore + levelScore);
+        levelScore = totalScore + 10;
+        setTotalScore(levelScore);
         setShowConfetti(true); // Trigger confetti for correct answer
+        playAudio("/music/sfx/Success.wav"); // Clapping audio for correct
         setTimeout(() => setShowConfetti(false), 7000); // Hide after 7 seconds
       } else {
         setShowErrorModal(true); // Show custom error modal
-        setTimeLeft(120); // Reset timer on incorrect answer
         setNextLoading(false);
+        playAudio("/music/sfx/Fail.wav"); // Sad audio for timeout
         return; // Prevent moving to next question
       }
 
@@ -164,7 +174,7 @@ export default function FlagsGameQuiz() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             level,
-            score: totalScore,
+            score: levelScore,
             game: "FlagsGameQuiz",
           }),
         });
@@ -175,6 +185,8 @@ export default function FlagsGameQuiz() {
         });
       } catch (error) {
         console.error("Error saving data:", error);
+      } finally {
+        setTimeLeft(120); // Reset timer for next word
       }
 
       setSelectedLetters([]);
@@ -203,6 +215,7 @@ export default function FlagsGameQuiz() {
         } finally {
           setLoading(false);
           setNextLoading(false);
+          setTimeLeft(120); // Reset timer for next word
         }
       }
     },
@@ -285,8 +298,6 @@ export default function FlagsGameQuiz() {
 
   if (!userId) return <RedirectToSignIn />;
 
-  console.log("Word: ", flags[current]?.answer);
-  console.log("Selected Letters: ", selectedLetters);
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-400 to-green-500 flex flex-col items-center justify-between py-8 relative">
       <div className="w-full px-4 flex items-center justify-between">

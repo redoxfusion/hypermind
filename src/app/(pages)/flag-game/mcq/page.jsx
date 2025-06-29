@@ -134,14 +134,25 @@ export default function FlagsGameMCQ() {
       const isCorrect = selectedOption === currentFlag.answer;
       let levelScore = 0;
 
+      // Play audio based on outcome
+      const playAudio = (path) => {
+        const audio = new Audio(path);
+        audio
+          .play()
+          .catch((error) => console.error("Audio play error:", error));
+      };
+
       if (isTimeout) {
         levelScore = Math.max(0, totalScore + levelScore);
-        setTotalScore(Math.max(0, totalScore + levelScore));
+        setTotalScore(levelScore);
       } else if (isCorrect) {
-        levelScore = 10;
-        setTotalScore(totalScore + levelScore);
+        levelScore = totalScore + 10; // Award 10 points for correct answer
+        setTotalScore(levelScore);
         setShowConfetti(true); // Trigger confetti for correct answer
+        playAudio("/music/sfx/Success.wav"); // Clapping audio for correct
         setTimeout(() => setShowConfetti(false), 7000); // Hide after 2 seconds
+      } else {
+        playAudio("/music/sfx/Fail.wav"); // Sad audio for incorrect answer
       }
 
       try {
@@ -161,6 +172,8 @@ export default function FlagsGameMCQ() {
         });
       } catch (error) {
         console.error("Error saving data:", error);
+      } finally {
+        setTimeLeft(120); // Reset timer for next problem
       }
 
       setSelectedOption(null);
@@ -189,6 +202,7 @@ export default function FlagsGameMCQ() {
         } finally {
           setLoading(false);
           setNextLoading(false);
+          setTimeLeft(120); // Reset timer for next problem
         }
       }
     },
@@ -320,7 +334,10 @@ export default function FlagsGameMCQ() {
             <p className="text-white text-lg mb-4 text-center">{hint}</p>
             <div className="grid grid-cols-2 gap-2 bg-white p-3 mx-2 rounded-2xl max-w-md">
               {options.map((option, index) => {
-                let buttonClass = `font-bold text-gray-700 hover:bg-gray-200 p-1 rounded-lg text-center border-gray-300`;
+                let buttonClass = `font-bold text-gray-700 p-1 rounded-lg text-center border-gray-300`;
+                if (!nextLoading) {
+                  buttonClass += " hover:bg-gray-200";
+                }
                 if (nextLoading && selectedOption) {
                   if (
                     selectedOption === currentFlag.answer &&

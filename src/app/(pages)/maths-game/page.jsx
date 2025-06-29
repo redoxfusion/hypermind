@@ -120,17 +120,28 @@ export default function MathsGame() {
       const isCorrect = selectedAnswer === currentProblem.answer;
       let levelScore = 0;
 
+      // Play audio based on outcome
+      const playAudio = (path) => {
+        const audio = new Audio(path);
+        audio
+          .play()
+          .catch((error) => console.error("Audio play error:", error));
+      };
+
       if (isTimeout) {
-        levelScore = -5; // Deduct 5 points for timeout
-        setTotalScore(Math.max(0, totalScore + levelScore));
+        levelScore = Math.max(0, totalScore - 5); // Deduct 5 points for timeout
+        setTotalScore(levelScore);
+        playAudio("/music/sfx/Fail.wav"); // Sad audio for timeout
       } else if (isCorrect) {
-        levelScore = 10; // Award 10 points for correct answer
-        setTotalScore(totalScore + levelScore);
+        levelScore = totalScore + 10; // Award 10 points for correct answer
+        setTotalScore(levelScore);
         setShowConfetti(true); // Trigger confetti for correct answer
+        playAudio("/music/sfx/Success.wav"); // Clapping audio for correct
         setTimeout(() => setShowConfetti(false), 7000); // Hide after 7 seconds
       } else {
         setShowErrorModal(true);
         setNextLoading(false);
+        playAudio("/music/sfx/Fail.wav"); // Sad audio for incorrect answer
         return; // Do not proceed to next problem if answer is incorrect
       }
 
@@ -138,7 +149,7 @@ export default function MathsGame() {
         await fetch("/api/scores", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ level, score: totalScore, game: "MathsGame" }),
+          body: JSON.stringify({ level, score: levelScore, game: "MathsGame" }),
         });
         await fetch("/api/user-progress", {
           method: "POST",
@@ -147,6 +158,8 @@ export default function MathsGame() {
         });
       } catch (error) {
         console.error("Error saving data:", error);
+      } finally {
+        setTimeLeft(120); // Reset timer for next problem
       }
 
       setSelectedAnswer(null);
@@ -175,6 +188,7 @@ export default function MathsGame() {
         } finally {
           setLoading(false);
           setNextLoading(false);
+          setTimeLeft(120); // Reset timer for next problem
         }
       }
     },
