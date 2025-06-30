@@ -23,7 +23,7 @@ export default function FlagsGameQuiz() {
   const [resetMessage, setResetMessage] = useState(null);
   const [resetError, setResetError] = useState(null);
   const [resetLoading, setResetLoading] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(120);
+  const [timeLeft, setTimeLeft] = useState(50);
   const [showConfetti, setShowConfetti] = useState(false);
   const [windowDimensions, setWindowDimensions] = useState({
     width: 0,
@@ -136,7 +136,7 @@ export default function FlagsGameQuiz() {
       if (!userId) return;
 
       setNextLoading(true);
-      setTimeLeft(120);
+      setTimeLeft(50);
 
       const currentFlag = flags[current];
       const isCorrect =
@@ -186,7 +186,7 @@ export default function FlagsGameQuiz() {
       } catch (error) {
         console.error("Error saving data:", error);
       } finally {
-        setTimeLeft(120); // Reset timer for next word
+        setTimeLeft(50); // Reset timer for next word
       }
 
       setSelectedLetters([]);
@@ -215,7 +215,7 @@ export default function FlagsGameQuiz() {
         } finally {
           setLoading(false);
           setNextLoading(false);
-          setTimeLeft(120); // Reset timer for next word
+          setTimeLeft(50); // Reset timer for next word
         }
       }
     },

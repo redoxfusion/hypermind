@@ -25,7 +25,7 @@ export default function EnglishGame() {
   const [resetMessage, setResetMessage] = useState(null);
   const [resetError, setResetError] = useState(null);
   const [resetLoading, setResetLoading] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(120); // 120 seconds timer
+  const [timeLeft, setTimeLeft] = useState(50); // 50 seconds timer
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [hint, setHint] = useState("");
   const [showConfetti, setShowConfetti] = useState(false);
@@ -114,7 +114,7 @@ export default function EnglishGame() {
       if (!userId) return;
 
       setNextLoading(true);
-      setTimeLeft(120); // Reset timer for next word
+      setTimeLeft(50); // Reset timer for next word
 
       // Handle scoring: +10 for correct answers, -5 for timeout, 0 for incorrect manual submission
       const currentWord = words[current];
@@ -164,7 +164,7 @@ export default function EnglishGame() {
       } catch (error) {
         console.error("Error saving data:", error);
       } finally {
-        setTimeLeft(120); // Reset timer for next word
+        setTimeLeft(50); // Reset timer for next word
       }
 
       setSelectedLetters([]);
@@ -193,7 +193,7 @@ export default function EnglishGame() {
         } finally {
           setLoading(false);
           setNextLoading(false);
-          setTimeLeft(120); // Reset timer for next word
+          setTimeLeft(50); // Reset timer for next word
         }
       }
     },

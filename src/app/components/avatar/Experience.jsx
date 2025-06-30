@@ -17,7 +17,7 @@ import { TypingBox } from "./TypingBox";
 export const Experience = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [currentAnimation, setCurrentAnimation] = useState("bored");
+  const [currentAnimation, setCurrentAnimation] = useState("dwarf_idle");
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const audioRef = useRef(null);
 
@@ -93,7 +93,7 @@ export const Experience = () => {
   return (
     <>
       {/* Background Music */}
-      <audio ref={audioRef} src="/music/ambient-lounge-instrumental.mp3" />
+      <audio ref={audioRef} src="/music/Hip-Hop-Is-Loop.wav" />
       {/* Audio Control Button */}
       <div className="fixed bottom-8 left-8 z-20">
         <button

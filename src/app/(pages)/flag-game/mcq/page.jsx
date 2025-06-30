@@ -22,7 +22,7 @@ export default function FlagsGameMCQ() {
   const [resetMessage, setResetMessage] = useState(null);
   const [resetError, setResetError] = useState(null);
   const [resetLoading, setResetLoading] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(120);
+  const [timeLeft, setTimeLeft] = useState(50);
   const [showConfetti, setShowConfetti] = useState(false);
   const [windowDimensions, setWindowDimensions] = useState({
     width: 0,
@@ -128,7 +128,7 @@ export default function FlagsGameMCQ() {
       if (!userId) return;
 
       setNextLoading(true);
-      setTimeLeft(120);
+      setTimeLeft(50);
 
       const currentFlag = flags[current];
       const isCorrect = selectedOption === currentFlag.answer;
@@ -173,7 +173,7 @@ export default function FlagsGameMCQ() {
       } catch (error) {
         console.error("Error saving data:", error);
       } finally {
-        setTimeLeft(120); // Reset timer for next problem
+        setTimeLeft(50); // Reset timer for next problem
       }
 
       setSelectedOption(null);
@@ -202,7 +202,7 @@ export default function FlagsGameMCQ() {
         } finally {
           setLoading(false);
           setNextLoading(false);
-          setTimeLeft(120); // Reset timer for next problem
+          setTimeLeft(50); // Reset timer for next problem
         }
       }
     },

@@ -10,7 +10,7 @@ export const useAILawyer = create((set, get) => ({
     set(() => ({
       lawyer,
       messages: get().messages.map((message) => {
-        message.audioPlayer = null; // New lawyer, new Voice
+        message.audioPlayer = null; // new Voice
         return message;
       }),
     }));

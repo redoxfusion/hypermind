@@ -24,7 +24,7 @@ export default function MathsGame() {
   const [resetMessage, setResetMessage] = useState(null);
   const [resetError, setResetError] = useState(null);
   const [resetLoading, setResetLoading] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(120); // 120 seconds timer
+  const [timeLeft, setTimeLeft] = useState(50); // 50 seconds timer
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [hint, setHint] = useState("");
   const [showConfetti, setShowConfetti] = useState(false);
@@ -113,7 +113,7 @@ export default function MathsGame() {
       if (!userId) return;
 
       setNextLoading(true);
-      setTimeLeft(120); // Reset timer for next problem
+      setTimeLeft(50); // Reset timer for next problem
 
       // Handle scoring: +10 for correct answers, -5 for timeout, 0 for incorrect manual submission
       const currentProblem = problems[current];
@@ -159,7 +159,7 @@ export default function MathsGame() {
       } catch (error) {
         console.error("Error saving data:", error);
       } finally {
-        setTimeLeft(120); // Reset timer for next problem
+        setTimeLeft(50); // Reset timer for next problem
       }
 
       setSelectedAnswer(null);
@@ -188,7 +188,7 @@ export default function MathsGame() {
         } finally {
           setLoading(false);
           setNextLoading(false);
-          setTimeLeft(120); // Reset timer for next problem
+          setTimeLeft(50); // Reset timer for next problem
         }
       }
     },
